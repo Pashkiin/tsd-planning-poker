@@ -1,0 +1,16 @@
+/* You can add global styles to this file, and also import other style files */
+
+// 1. Tailwind Directives (Required)
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// 2. Bootstrap (Example: Import the whole thing)
+// You might prefer importing only specific parts later for optimization
+@import "bootstrap/scss/bootstrap";
+
+// 3. Your Custom Global Styles
+body {
+  // Example custom style
+  font-family: sans-serif;
+}
