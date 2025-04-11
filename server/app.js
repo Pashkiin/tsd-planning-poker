@@ -1,11 +1,13 @@
 const express = require("express");
+const applyJsonMiddleware = require("./src/middlewares/json.middleware");
+
 const app = express();
 
-// Basic Middleware (add more later: cors, body-parser, etc.)
-app.use(express.json());
+//API middlewares
+applyJsonMiddleware(app);
 
 // Basic Route
-app.get("/api/health", (req, res) => {
+app.get("/api", (req, res) => {
   res.status(200).json({ status: "UP" });
 });
 
