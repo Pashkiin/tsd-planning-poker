@@ -1,6 +1,9 @@
 const express = require("express");
 const applyJsonMiddleware = require("./src/middlewares/json.middleware");
 
+//routes
+const cardRouter = require("./src/routes/cardRoute"); // Ścieżka do routera
+
 const app = express();
 
 //API middlewares
@@ -11,7 +14,6 @@ app.get("/api", (req, res) => {
   res.status(200).json({ status: "UP" });
 });
 
-// TODO: Add API routes from src/api later
-// TODO: Add error handling middleware later
+app.use("/api/cards", cardRouter);
 
 module.exports = app;
