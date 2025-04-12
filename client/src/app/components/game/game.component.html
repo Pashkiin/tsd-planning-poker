@@ -1,0 +1,80 @@
+<div class="container mx-auto p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-2xl font-bold">Planning Poker Game</h2>
+    <button class="btn btn-sm btn-outline-secondary" (click)="logout()">
+      Logout
+    </button>
+  </div>
+
+  <div *ngIf="isLoading && !(cards$ | async)" class="alert alert-info">
+    Loading cards...
+  </div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <h3 class="text-xl font-semibold mb-3">Select Your Card:</h3>
+  <div
+    *ngIf="cards$ | async as cards"
+    class="d-flex flex-wrap justify-content-center gap-3 mb-4"
+  >
+    <div
+      *ngFor="let card of cards"
+      class="card poker-card shadow-sm"
+      [class.selected]="(selectedCard | async)?._id === card._id"
+      [class.selectable]="!isConfirmed"
+      [class.disabled]="isConfirmed"
+      (click)="selectCard(card)"
+    >
+      <div class="card-body text-center">
+        <div
+          class="poker-card-color-indicator"
+          [style.backgroundColor]="card.color || '#FFFFFF'"
+        ></div>
+        <h5 class="card-title display-6">{{ card.label }}</h5>
+        <p *ngIf="card.description" class="card-text text-muted small">
+          {{ card.description }}
+        </p>
+        <span *ngIf="card.isSpecial" class="badge bg-info">Special</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <div *ngIf="selectedCard | async as selCard">
+      <p class="mb-3">
+        You selected: <strong>{{ selCard.label }}</strong>
+      </p>
+      <button
+        class="btn btn-warning me-2"
+        (click)="resetSelection()"
+        [disabled]="isConfirmed || isLoading"
+      >
+        Reset Selection
+      </button>
+      <button
+        class="btn btn-success"
+        (click)="confirmSelection()"
+        [disabled]="isConfirmed || isLoading"
+      >
+        {{
+          isConfirmed
+            ? "Confirmed!"
+            : isLoading
+            ? "Confirming..."
+            : "Confirm Selection"
+        }}
+      </button>
+    </div>
+    <div *ngIf="!(selectedCard | async)">
+      <p class="text-muted">Click a card above to make your selection.</p>
+    </div>
+  </div>
+
+  <div class="text-center mt-5" *ngIf="isConfirmed">
+    <p class="alert alert-info">
+      Your selection is confirmed. Waiting for others...
+    </p>
+    <button class="btn btn-secondary" (click)="endRound()">
+      Dev: End Round / Next
+    </button>
+  </div>
+</div>
