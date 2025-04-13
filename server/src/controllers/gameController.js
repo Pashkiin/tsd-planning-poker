@@ -1,4 +1,4 @@
-const {selectCard, getSession, checkAndBroadcastVotes,setTaskName, resetVotes } = require("../gameLogic/gameLogic");
+const {selectCard, getSession,setTaskName, resetVotes } = require("../gameLogic/gameLogic");
 
 const voteCard = (req, res) => {
     const { userId, cardValue } = req.body;
