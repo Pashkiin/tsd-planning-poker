@@ -18,7 +18,7 @@ interface LoginResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = '/api/login';
+  private apiUrl = '/api/player/login';
   private userKey = 'planning_poker_user_id';
 
   private loggedIn = new BehaviorSubject<boolean>(this.hasUserId());
