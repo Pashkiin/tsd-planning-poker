@@ -8,7 +8,7 @@ export const routes: Routes = [
   {
     path: 'game',
     component: GameComponent,
-    //canActivate: [authGuard],
+    canActivate: [authGuard],
   },
 
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // Redirect empty path to login

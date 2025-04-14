@@ -1,80 +1,155 @@
 <div class="container mx-auto p-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-2xl font-bold">Planning Poker Game</h2>
-    <button class="btn btn-sm btn-outline-secondary" (click)="logout()">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h2 class="text-2xl font-bold mb-2 me-3">Planning Poker</h2>
+    <h3 class="text-xl text-muted text-center flex-grow-1 mb-2 mx-3">
+      Task: {{ (sessionData | async)?.taskName || "Waiting for task..." }}
+    </h3>
+    <button
+      class="btn btn-sm btn-outline-secondary mb-2 ms-3"
+      (click)="logout()"
+    >
       Logout
     </button>
   </div>
 
-  <div *ngIf="isLoading && !(cards$ | async)" class="alert alert-info">
+  <div *ngIf="isLoadingCards && !(cards$ | async)" class="alert alert-info">
     Loading cards...
+  </div>
+  <div
+    *ngIf="isLoadingSession && !(sessionData | async)"
+    class="alert alert-info"
+  >
+    Loading session...
   </div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
-  <h3 class="text-xl font-semibold mb-3">Select Your Card:</h3>
-  <div
-    *ngIf="cards$ | async as cards"
-    class="d-flex flex-wrap justify-content-center gap-3 mb-4"
-  >
-    <div
-      *ngFor="let card of cards"
-      class="card poker-card shadow-sm"
-      [class.selected]="(selectedCard | async)?._id === card._id"
-      [class.selectable]="!isConfirmed"
-      [class.disabled]="isConfirmed"
-      (click)="selectCard(card)"
-    >
-      <div class="card-body text-center">
-        <div
-          class="poker-card-color-indicator"
-          [style.backgroundColor]="card.color || '#FFFFFF'"
-        ></div>
-        <h5 class="card-title display-6">{{ card.label }}</h5>
-        <p *ngIf="card.description" class="card-text text-muted small">
-          {{ card.description }}
+  <div class="row">
+    <div class="col-md-9">
+      <h4 class="text-lg font-semibold mb-3">Select Your Card:</h4>
+      <div *ngIf="cards$ | async as cards; else loadingCardsTemplate">
+        <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+          <div
+            *ngFor="let card of cards"
+            class="card poker-card shadow-sm"
+            [class.selected]="(selectedCard | async)?._id === card._id"
+            [class.selectable]="!isConfirmed && !isLoading"
+            [class.disabled]="isConfirmed || isLoading"
+            (click)="selectCard(card)"
+          >
+            <div class="card-body text-center">
+              <div
+                class="poker-card-color-indicator"
+                [style.backgroundColor]="card.color || '#FFFFFF'"
+              ></div>
+              <h5 class="card-title display-6">{{ card.label }}</h5>
+              <p *ngIf="card.description" class="card-text text-muted small">
+                {{ card.description }}
+              </p>
+              <span *ngIf="card.isSpecial" class="badge bg-info">Special</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #loadingCardsTemplate>
+        <div *ngIf="!isLoadingCards" class="alert alert-warning">
+          No cards found or failed to load.
+        </div>
+      </ng-template>
+
+      <div class="text-center mt-4 mb-4">
+        <div *ngIf="selectedCard | async as selCard; else noSelection">
+          <p class="mb-3">
+            You selected: <strong>{{ selCard.label }}</strong>
+          </p>
+          <button
+            class="btn btn-warning me-2"
+            (click)="resetSelection()"
+            [disabled]="isConfirmed || isLoading"
+          >
+            Reset Selection
+          </button>
+          <button
+            class="btn btn-success"
+            (click)="confirmSelection()"
+            [disabled]="isConfirmed || isLoading"
+          >
+            {{
+              isConfirmed
+                ? "Vote Confirmed"
+                : isLoading
+                ? "Sending Vote..."
+                : "Confirm Vote"
+            }}
+          </button>
+        </div>
+        <ng-template #noSelection>
+          <p class="text-muted">Click a card above to make your selection.</p>
+        </ng-template>
+      </div>
+      <div class="text-center mt-3" *ngIf="isConfirmed">
+        <p class="alert alert-info d-inline-block">
+          Your vote is locked in. Waiting for others...
         </p>
-        <span *ngIf="card.isSpecial" class="badge bg-info">Special</span>
       </div>
     </div>
-  </div>
 
-  <div class="text-center mt-4">
-    <div *ngIf="selectedCard | async as selCard">
-      <p class="mb-3">
-        You selected: <strong>{{ selCard.label }}</strong>
-      </p>
-      <button
-        class="btn btn-warning me-2"
-        (click)="resetSelection()"
-        [disabled]="isConfirmed || isLoading"
+    <div class="col-md-3">
+      <h4 class="text-lg font-semibold mb-3">Players in Session</h4>
+      <div class="mb-3 text-center bg-light p-2 rounded">
+        <span class="fw-bold">Average Vote:</span>
+        <span class="ms-2 fs-5">
+          {{ (averageVote$ | async)?.toFixed(1) || "N/A" }}
+        </span>
+        <div class="text-muted small" *ngIf="!(averageVote$ | async)">
+          (Average appears after numeric votes are cast)
+        </div>
+      </div>
+      <ul
+        class="list-group"
+        *ngIf="
+          (sessionData | async)?.players as players;
+          else loadingPlayersTemplate
+        "
       >
-        Reset Selection
-      </button>
-      <button
-        class="btn btn-success"
-        (click)="confirmSelection()"
-        [disabled]="isConfirmed || isLoading"
-      >
-        {{
-          isConfirmed
-            ? "Confirmed!"
-            : isLoading
-            ? "Confirming..."
-            : "Confirm Selection"
-        }}
-      </button>
-    </div>
-    <div *ngIf="!(selectedCard | async)">
-      <p class="text-muted">Click a card above to make your selection.</p>
-    </div>
-  </div>
+        <li
+          *ngFor="let player of players"
+          class="list-group-item d-flex justify-content-between align-items-center"
+          [class.list-group-item-secondary]="player.id === currentUserId"
+        >
+          <span>
+            {{ player.username }}
+            <span *ngIf="player.id === currentUserId"> (You)</span>
+          </span>
+          <span
+            *ngIf="player.selectedCard !== null"
+            class="badge bg-success rounded-pill"
+            title="Voted"
+          >
+            ✔️ Voted
+          </span>
+          <span
+            *ngIf="player.selectedCard === null"
+            class="badge bg-light text-dark rounded-pill"
+            title="Waiting"
+          >
+            🤔 Waiting
+          </span>
+        </li>
+        <li *ngIf="players.length === 0" class="list-group-item">
+          No players yet.
+        </li>
+      </ul>
+      <ng-template #loadingPlayersTemplate>
+        <div *ngIf="!isLoadingSession" class="list-group-item">
+          No player data found.
+        </div>
+      </ng-template>
 
-  <div class="text-center mt-5" *ngIf="isConfirmed">
-    <p class="alert alert-info">
-      Your selection is confirmed. Waiting for others...
-    </p>
-    <button class="btn btn-secondary" (click)="endRound()">
-      Dev: End Round / Next
-    </button>
+      <div class="text-center mt-5">
+        <button class="btn btn-secondary btn-sm" (click)="startNewRound()">
+          Dev: Start New Round
+        </button>
+      </div>
+    </div>
   </div>
 </div>

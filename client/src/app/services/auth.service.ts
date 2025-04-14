@@ -9,10 +9,7 @@ import {
   throwError,
 } from 'rxjs';
 import { Router } from '@angular/router';
-
-interface LoginResponse {
-  userId: string;
-}
+import { LoginResponse } from '../models/login-response.model';
 
 @Injectable({
   providedIn: 'root',
