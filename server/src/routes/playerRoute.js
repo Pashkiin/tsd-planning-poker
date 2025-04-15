@@ -10,7 +10,7 @@ router.get('/players', (req, res) => {
     playerController.fetchPlayers(req, res);
 });
 
-router.post('/delete', (req,res) =>{
+router.delete('/delete/:userId', (req,res) =>{
     playerController.removePlayerFromSession(req,res)
 })
 

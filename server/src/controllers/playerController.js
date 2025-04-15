@@ -13,7 +13,7 @@ const fetchPlayers = (_req, res) => {
 };
 
 const removePlayerFromSession = (req, res) => {
-    const { userId } = req.body;
+    const { userId } = req.params;
     if (!userId) {
         return res.status(400).json({ error: "Brak userId" });
     }
@@ -23,7 +23,7 @@ const removePlayerFromSession = (req, res) => {
         return res.status(404).json({ error: "Gracz nie znaleziony" });
     }
 
-    res.json({ success: true });
+    res.status(200).json({ success: true });
 };
 
 

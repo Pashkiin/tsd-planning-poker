@@ -19,7 +19,7 @@ function selectCard(playerId, card) {
 }
 
 function removePlayer(playerId) {
-    return session.removePlayer(playerId); // zakładamy, że ta metoda istnieje w SessionModel
+    return session.removePlayer(playerId);
 }
 
 function getSession() {

@@ -60,11 +60,11 @@ export class AuthService {
   logout(): void {
     const userId = localStorage.getItem(this.userKey);
     if (!userId) {
-      this.finalizeLogout();
+      console.error("Brak userId");
       return;
     }
 
-    this.http.post(`${this.logoutUrl}`, { userId }).subscribe({
+    this.http.delete(`${this.logoutUrl}/${userId}`).subscribe({
       next: () => this.finalizeLogout(),
       error: (err) => {
         console.error('Błąd przy usuwaniu gracza z sesji:', err);
