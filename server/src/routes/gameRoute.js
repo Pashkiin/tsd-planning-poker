@@ -13,5 +13,6 @@ router.get('/session', (req, res) => {
 router.post('/task', (req, res) => {
     gameController.updateTask(req, res);
 });
+router.post('/reset', gameController.resetVotesHandler);
 
 module.exports = router;

@@ -17,6 +17,7 @@ import { LoginResponse } from '../models/login-response.model';
 export class AuthService {
   private apiUrl = '/api/player/login';
   private userKey = 'planning_poker_user_id';
+  private logoutUrl = '/api/player/delete'
 
   private loggedIn = new BehaviorSubject<boolean>(this.hasUserId());
   isLoggedIn$ = this.loggedIn.asObservable();
@@ -57,6 +58,22 @@ export class AuthService {
   }
 
   logout(): void {
+    const userId = localStorage.getItem(this.userKey);
+    if (!userId) {
+      console.error("Brak userId");
+      return;
+    }
+
+    this.http.delete(`${this.logoutUrl}/${userId}`).subscribe({
+      next: () => this.finalizeLogout(),
+      error: (err) => {
+        console.error('Błąd przy usuwaniu gracza z sesji:', err);
+        this.finalizeLogout(); // nawet jeśli błąd, wyloguj lokalnie
+      }
+    });
+  }
+
+  private finalizeLogout(): void {
     localStorage.removeItem(this.userKey);
     this.loggedIn.next(false);
     this.router.navigate(['/login']);

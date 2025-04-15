@@ -29,8 +29,14 @@ const updateTask = (req, res) => {
     res.json({ success: true });
 };
 
+const resetVotesHandler = (_req, res) => {
+    resetVotes();
+    res.json({ success: true, message: "Głosy zostały zresetowane" });
+};
+
 module.exports = {
     voteCard,
     getGameSession,
     updateTask,
+    resetVotesHandler
 };
