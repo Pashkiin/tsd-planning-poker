@@ -83,4 +83,17 @@ export class GameService {
       })
     );
   }
+  globalReset(): Observable<any> {
+    return this.http.post<any>(`${this.gameApiUrl}/reset`, {}).pipe(
+      catchError((error) => {
+        console.error('Error during global card reset:', error);
+        return throwError(() => new Error('Failed to perform global card reset.'));
+      })
+    );
+  }
+
+  updateTaskName(taskName: string): Observable<any> {
+    return this.http.post(`${this.gameApiUrl}/task`, { taskName });
+  }
+
 }

@@ -10,5 +10,8 @@ router.get('/players', (req, res) => {
     playerController.fetchPlayers(req, res);
 });
 
+router.post('/delete', (req,res) =>{
+    playerController.removePlayerFromSession(req,res)
+})
 
 module.exports = router;

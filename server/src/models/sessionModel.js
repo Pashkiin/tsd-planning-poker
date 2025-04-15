@@ -12,6 +12,16 @@ class SessionModel {
         return player;
     }
 
+    removePlayer(playerId) {
+        const index = this.players.findIndex(p => p.id === playerId);
+        if (index !== -1) {
+            this.players.splice(index, 1);
+            return true;
+        }
+        return false;
+    }
+
+
     getPlayers() {
         return this.players;
     }

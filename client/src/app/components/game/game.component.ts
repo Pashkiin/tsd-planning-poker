@@ -182,13 +182,50 @@ export class GameComponent implements OnInit, OnDestroy {
     this.authService.logout();
   }
 
-  // Placeholder for next round/reset logic
+  isEditingTaskName = false;
+  taskName = '';
+
+  enableTaskEdit(): void {
+    const currentSession = this.sessionData.getValue();
+    this.taskName = currentSession?.taskName || '';
+    this.isEditingTaskName = true;
+  }
+
+  onTaskInputChange(value: string): void {
+    this.taskName = value;
+  }
+
+  onTaskInputBlur(): void {
+    if (this.taskName.trim()) {
+      this.gameService.updateTaskName(this.taskName).subscribe(() => {
+        this.refreshSession(); // Pobierz najnowsze dane
+      });
+    }
+    this.isEditingTaskName = false;
+  }
+
+  refreshSession(): void {
+    this.gameService.getSession().subscribe((session) => {
+      this.sessionData.next(session);
+    });
+  }
+
+
+  //Resets players estimations
   startNewRound(): void {
-    console.log('Starting new round (logic needed)');
     this.isConfirmed = false;
     this.selectedCard.next(null);
-    this.gameService
-      .getSession()
-      .subscribe((session) => this.sessionData.next(session));
+
+    this.gameService.globalReset().subscribe({
+      next: () => {
+        // Po zresetowaniu głosów, pobierz odświeżoną sesję
+        this.gameService.getSession().subscribe((session) => {
+          this.sessionData.next(session);
+        });
+      },
+      error: (err) => {
+        console.error('Nie udało się rozpocząć nowej rundy:', err);
+      },
+    });
   }
 }

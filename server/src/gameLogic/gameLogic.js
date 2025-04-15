@@ -18,6 +18,10 @@ function selectCard(playerId, card) {
     return true;
 }
 
+function removePlayer(playerId) {
+    return session.removePlayer(playerId); // zakładamy, że ta metoda istnieje w SessionModel
+}
+
 function getSession() {
     return session;
 }
@@ -34,6 +38,7 @@ module.exports = {
     addPlayer,
     getPlayers,
     selectCard,
+    removePlayer,
     getSession,
     setTaskName,
     resetVotes
