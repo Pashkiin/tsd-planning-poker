@@ -7,15 +7,15 @@ on:
         branches: [main, dev]
 
 jobs:
-    build-and-test:
+    backend:
+        name: Backend Tests
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout repo
               uses: actions/checkout@v3
 
-            # Backend - Node.js
-            - name: Set up Node.js for server
+            - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
                   node-version: "18"
@@ -28,10 +28,17 @@ jobs:
 
             - name: Run backend tests
               working-directory: ./server
-              run: echo "Backend skip"
+              run: npm test
 
-            # Frontend - Angular
-            - name: Set up Node.js for Angular
+    frontend:
+        name: Frontend Tests
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
                   node-version: "18"
@@ -42,6 +49,6 @@ jobs:
               working-directory: ./client
               run: npm install
 
-            - name: Build Angular app
+            - name: Run frontend tests
               working-directory: ./client
-              run: npm run test
+              run: npm run test -- --watch=false --browsers=ChromeHeadless
