@@ -3,6 +3,7 @@ const app = require("./app");
 const config = require("./src/config/settings");
 const connectDB = require("./src/config/database");
 const { Server } = require("socket.io");
+const initializeWebSocket = require("./src/websockets/socketHandler");
 
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
@@ -14,29 +15,7 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
   console.log(`🔌 New client connected: ${socket.id}`);
-
-  // Example: Listen for a custom event from the client, broadcast it to others, and send a response back
-  socket.on("clientMessage", (data) => {
-    console.log(`✉️ Message from ${socket.id}:`, data);
-
-    socket.broadcast.emit("serverMessage", {
-      user: socket.id,
-      message: data.message,
-    });
-
-    socket.emit("serverMessage", {
-      user: "Server",
-      message: "Message received!",
-    });
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`🔌 Client disconnected: ${socket.id}`);
-    // TODO: Handle disconnection logic
-  });
-
-  // More specific event handlers will be added in a dedicated file
-  // initializeWebSocket(io, socket, sessionManager);
+  initializeWebSocket(io, socket);
 });
 
 const PORT = config.port;
