@@ -3,87 +3,95 @@ import { Router } from '@angular/router';
 import { SessionService } from '../../services/session.service';
 import { CommonModule } from '@angular/common';
 import { SessionSummary } from '../../models/session-summary.model';
+import { SessionCreate } from '../../models/session-create.model';
 import { Invitation } from '../../models/invitation.model';
 import { AuthService } from '../../services/auth.service';
+import * as bootstrap from 'bootstrap';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-lobby',
-  imports: [CommonModule],
+  standalone: true, // Dodano dla obsługi imports bez NgModule
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './lobby.component.html',
   styleUrls: ['./lobby.component.scss'],
 })
 export class LobbyComponent implements OnInit {
   sessions: SessionSummary[] = [];
-  invitations: Invitation[] = []; // Zmieniamy `any[]` na `Invitation[]` dla bezpieczeństwa typów
+  invitations: Invitation[] = [];
   userId: string | null = null;
+
+  sessionForm!: FormGroup;
 
   constructor(
     private sessionService: SessionService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
     this.userId = this.authService.getUserId();
+
     if (this.userId) {
-      this.loadSessions();
+      this.sessionService.getAllSessions().subscribe({
+        next: (sessions: SessionSummary[]) => {
+          this.sessions = sessions;
+        },
+        error: (err) => {
+          console.error('Błąd podczas pobierania sesji:', err);
+        },
+      });
     } else {
-      // Jeśli użytkownik nie jest zalogowany, przekieruj go do strony logowania
       console.error('Brak identyfikatora użytkownika!');
       this.router.navigate(['/login']);
     }
-  }
 
-  loadSessions(): void {
-    this.sessionService.getSessions().subscribe({
-      next: (data) => {
-        this.sessions = data;
-      },
-      error: (err) => {
-        console.error('Błąd podczas pobierania sesji:', err);
-      },
+    this.sessionForm = this.fb.group({
+      sessionName: ['', Validators.required],
+      taskName: ['', Validators.required],
+      taskDescription: ['', Validators.required],
     });
   }
 
   createSession(): void {
-    if (this.userId === null) {
-      console.error('Brak identyfikatora użytkownika!');
-      return;
-    }
+    const modal = new bootstrap.Modal(
+      document.getElementById('createSessionModal')!
+    );
+    modal.show();
+  }
 
-    const payload = {
-      creatorId: this.userId, // Gwarantujemy, że userId nie jest null
-      sessionName: `Nowa sesja od ${this.userId}`,
-      tasks: [], // Możesz dodać zadania, jeśli chcesz
+  onSubmitSessionForm(): void {
+    if (!this.userId) return;
+
+    const form = this.sessionForm.value;
+    const sessionData: SessionCreate = {
+      creatorId: this.userId,
+      sessionName: form.sessionName,
+      tasks: [
+        {
+          name: form.taskName,
+          description: form.taskDescription,
+        },
+      ],
     };
 
-    this.sessionService.createSession(payload).subscribe({
+    this.sessionService.updateSessionCreate(sessionData);
+    this.sessionService.createSession(this.userId).subscribe({
       next: (res) => {
-        console.log('Stworzono sesję:', res);
-        // Przekierowanie do strony gry po stworzeniu sesji
-        this.router.navigate([`/game/${res.sessionId}`]);
+        bootstrap.Modal.getInstance(
+          document.getElementById('createSessionModal')!
+        )?.hide();
+        this.sessionService
+          .getAllSessions()
+          .subscribe((sessions) => (this.sessions = sessions));
       },
-      error: (err) => {
-        console.error('Błąd podczas tworzenia sesji:', err);
-      },
+      error: (err) => console.error(err),
     });
-  }
-
-  invitePlayer(session: SessionSummary): void {
-    console.log('Wysyłanie zaproszenia do sesji:', session.sessionId);
-    // Tu możesz dodać logikę wysyłania zaproszeń do gracza
-  }
-
-  acceptInvitation(invitation: Invitation): void {
-    console.log('Zaakceptowano zaproszenie do sesji:', invitation.sessionId);
-    // Usuwamy zaproszenie z listy
-    this.invitations = this.invitations.filter((i) => i.id !== invitation.id);
-    // Przekierowanie do gry po zaakceptowaniu zaproszenia
-    this.router.navigate([`/game/${invitation.sessionId}`]);
-  }
-
-  declineInvitation(invitation: Invitation): void {
-    // Usuwamy zaproszenie z listy, gdy jest odrzucone
-    this.invitations = this.invitations.filter((i) => i.id !== invitation.id);
   }
 }

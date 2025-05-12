@@ -5,6 +5,7 @@ import { catchError, tap, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { SessionCreateResponse } from '../models/session-create-response.model';
 import { SessionCreate } from '../models/session-create.model';
+import { SessionSummary } from '../models/session-summary.model';
 
 @Injectable({
   providedIn: 'root',
@@ -95,8 +96,8 @@ export class SessionService {
       );
   }
 
-  getAllSessions(): Observable<SessionCreateResponse[]> {
-    return this.http.get<SessionCreateResponse[]>(this.apiUrl).pipe(
+  getAllSessions(): Observable<SessionSummary[]> {
+    return this.http.get<SessionSummary[]>(this.apiUrl).pipe(
       catchError((error) => {
         console.error('Error fetching sessions:', error);
         return throwError(() => new Error('Failed to fetch sessions.'));
