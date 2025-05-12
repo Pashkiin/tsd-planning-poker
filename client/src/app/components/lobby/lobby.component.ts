@@ -66,6 +66,12 @@ export class LobbyComponent implements OnInit {
     modal.show();
   }
 
+  joinSession(sessionId: string): void {
+    if (!this.userId) return;
+    this.sessionService.setSessionId(sessionId);
+    this.router.navigate([`/session/${sessionId}`]);
+  }
+
   onSubmitSessionForm(): void {
     if (!this.userId) return;
 
@@ -87,12 +93,14 @@ export class LobbyComponent implements OnInit {
         bootstrap.Modal.getInstance(
           document.getElementById('createSessionModal')!
         )?.hide();
+        document.body.classList.remove('modal-open');
+        document.querySelector('.modal-backdrop')?.remove();
         this.sessionService
           .getAllSessions()
           .subscribe((sessions) => (this.sessions = sessions));
       },
       error: (err) => console.error(err),
     });
-    this.router.navigate([`/session/${this.sessionService.getSessionId()}`]);
+    this.joinSession(this.sessionService.getSessionId()!);
   }
 }

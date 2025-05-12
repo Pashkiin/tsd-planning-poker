@@ -18,7 +18,9 @@
                                 <small class="text-muted">Zadanie: {{ session.currentTaskName }}</small>
                             </div>
                             <div class="text-md-end mt-2 mt-md-0">
-                                <span class="badge bg-secondary me-2">Gracze: {{ session.playerCount }}</span>
+                                <button class="btn btn-primary btn-sm me-2 px-3"
+                                    (click)="joinSession(session.sessionId)">Dołącz</button>
+                                <span class="badge bg-secondary me-2 px-2 py-1">Gracze: {{ session.playerCount }}</span>
                             </div>
                         </div>
                     </li>

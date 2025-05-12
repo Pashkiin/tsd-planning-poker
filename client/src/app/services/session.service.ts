@@ -43,6 +43,14 @@ export class SessionService {
     return localStorage.getItem(this.sessionKey);
   }
 
+  setSessionId(sessionId: string): void {
+    if (!sessionId) {
+      throw new Error('Session ID is required.');
+    }
+    localStorage.setItem(this.sessionKey, sessionId);
+    this.currentSessionSubject.next(sessionId);
+  }
+
   getSessionCreate(): SessionCreate {
     return this.SessionCreate;
   }

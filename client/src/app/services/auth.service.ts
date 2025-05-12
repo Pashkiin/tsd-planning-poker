@@ -10,6 +10,7 @@ import {
 } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoginResponse } from '../models/login-response.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +24,11 @@ export class AuthService {
   private loggedIn = new BehaviorSubject<boolean>(this.hasUserId());
   isLoggedIn$ = this.loggedIn.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   private hasUserId(): boolean {
     return !!localStorage.getItem(this.userKey);
@@ -83,5 +88,23 @@ export class AuthService {
     localStorage.removeItem(this.userKey);
     this.loggedIn.next(false);
     this.router.navigate(['/login']);
+  }
+
+  private redirectUrl: string | null = null;
+
+  setRedirectUrl(url: string) {
+    this.redirectUrl = url;
+  }
+
+  getRedirectUrl(): string | null {
+    return this.redirectUrl;
+  }
+
+  getSessionId(): string | null {
+    return this.route.snapshot.paramMap.get('sessionId');
+  }
+
+  clearRedirectUrl() {
+    this.redirectUrl = null;
   }
 }
