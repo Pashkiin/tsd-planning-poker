@@ -44,7 +44,7 @@ export class LoginComponent {
     this.authService.login(username).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/game']);
+        this.router.navigate(['/lobby']);
       },
       error: (err) => {
         this.isLoading = false;
