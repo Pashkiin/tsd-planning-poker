@@ -3,12 +3,18 @@ import { LoginComponent } from './components/login/login.component';
 import { GameComponent } from './components/game/game.component';
 import { LobbyComponent } from './components/lobby/lobby.component';
 import { authGuard } from './guards/auth.guard';
+import { SessionComponent } from './components/session/session.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {
     path: 'lobby',
     component: LobbyComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'session/:sessionId',
+    component: SessionComponent,
     canActivate: [authGuard],
   },
   {

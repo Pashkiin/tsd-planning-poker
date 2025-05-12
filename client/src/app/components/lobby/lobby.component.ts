@@ -93,5 +93,6 @@ export class LobbyComponent implements OnInit {
       },
       error: (err) => console.error(err),
     });
+    this.router.navigate([`/session/${this.sessionService.getSessionId()}`]);
   }
 }
