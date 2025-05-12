@@ -1,4 +1,4 @@
-export interface CreateSessionResponse {
+export interface SessionCreateResponse {
   message: string;
   sessionId: string;
   sessionName: string;
