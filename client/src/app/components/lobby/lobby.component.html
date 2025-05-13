@@ -20,6 +20,8 @@
                             <div class="text-md-end mt-2 mt-md-0">
                                 <button class="btn btn-primary btn-sm me-2 px-3"
                                     (click)="joinSession(session.sessionId)">Dołącz</button>
+                                <button class="btn btn-primary btn-sm me-2 px-3"
+                                    (click)="copyLinkToClipboard(session.sessionId)">Link</button>
                                 <span class="badge bg-secondary me-2 px-2 py-1">Gracze: {{ session.playerCount }}</span>
                             </div>
                         </div>

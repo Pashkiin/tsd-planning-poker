@@ -115,4 +115,17 @@ export class LobbyComponent implements OnInit {
       error: (err) => console.error(err),
     });
   }
+
+  copyLinkToClipboard(sessionId: string): void {
+    const currentGameLink = `${window.location.origin}/session/${sessionId}`;
+
+    navigator.clipboard
+      .writeText(currentGameLink)
+      .then(() => {
+        console.log('Link skopiowany do schowka');
+      })
+      .catch((err) => {
+        console.error('Nie udało się skopiować linku', err);
+      });
+  }
 }
