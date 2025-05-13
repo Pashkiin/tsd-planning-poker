@@ -4,6 +4,12 @@ import { GameSocketService } from '../../services/game-socket.service'; // Adjus
 import { SessionService } from '../../services/session.service'; // Adjust path
 import { AuthService } from '../../services/auth.service'; // If you need authentication
 import { Observable } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Card } from '../../models/card.model'; // Adjust path
+import { Player } from '../../models/player.model'; // Adjust path
+import { GameSession } from '../../models/game-session.model'; // Adjust path
+import { CardService } from '../../services/card.service'; // Adjust path
 
 @Component({
   selector: 'app-session',
@@ -14,11 +20,19 @@ import { Observable } from 'rxjs';
 })
 export class SessionComponent {
   socketReady$: Observable<boolean>;
+  cards$: Observable<Card[]> | undefined;
+  selectedCard = new BehaviorSubject<Card | null>(null);
+  isConfirmed = false;
+
+  error: string | null = null;
+  isLoadingCards = false;
+  selectedCardValue: number | string | null = null;
 
   constructor(
     private gameSocketService: GameSocketService,
     private sessionService: SessionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cardService: CardService // Adjust path
   ) {
     // Get socket connection status from GameSocketService
     this.socketReady$ = this.gameSocketService.getSessionConnected();
@@ -39,6 +53,8 @@ export class SessionComponent {
     const username = this.authService.getUserName();
 
     this.joinGameSession(sessionId!, userId!, username!);
+    this.loadCards();
+    this.selectedCardValue = null;
   }
 
   joinGameSession(sessionId: string, userId: string, username: string): void {
@@ -51,5 +67,35 @@ export class SessionComponent {
         console.log('Socket is not connected yet. Please try again later.');
       }
     });
+  }
+
+  loadCards(): void {
+    this.isLoadingCards = true;
+    this.error = null;
+    this.cards$ = this.cardService.getCards().pipe(
+      catchError((err) => {
+        this.error = `Error loading cards: ${err.message}`;
+        console.error(err);
+        return of([]);
+      })
+    );
+    this.cards$.subscribe(() => (this.isLoadingCards = false));
+  }
+
+  onCardSelected(value: number | string | null): void {
+    this.selectedCardValue = value;
+  }
+
+  submitVote(): void {
+    if (this.selectedCardValue !== null) {
+      this.isConfirmed = true;
+      this.gameSocketService.submitVote(this.selectedCardValue);
+    }
+  }
+
+  clearVote(): void {
+    this.isConfirmed = false;
+    this.selectedCardValue = null;
+    this.gameSocketService.clearVote();
   }
 }

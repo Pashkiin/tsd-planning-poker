@@ -35,4 +35,16 @@ export class GameSocketService {
   getSessionConnected() {
     return this.socketConnected$;
   }
+
+  submitVote(selectedCardValue: number | string | null): void {
+    if (selectedCardValue !== null) {
+      this.socket.emit('submitVote', {
+        cardValue: selectedCardValue,
+      });
+    }
+  }
+
+  clearVote(): void {
+    this.socket.emit('clearMyVote');
+  }
 }
