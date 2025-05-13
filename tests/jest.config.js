@@ -1,4 +1,4 @@
-odule.exports = {
+module.exports = {
   testEnvironment: "node", // E2E tests run in Node controlling the browser
   verbose: true,
   testTimeout: 60000, // Increase timeout for browser tests

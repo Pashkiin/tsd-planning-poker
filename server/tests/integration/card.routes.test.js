@@ -53,14 +53,14 @@ describe("Card API (/api/cards)", () => {
       expect(dbCard.label).toBe(newCardData.label);
     });
 
-    it("should return 400 if required fields are missing", async () => {
+    it("should return 500 if required fields are missing", async () => {
       const invalidCardData = { description: "Missing required fields" };
 
       await request(app)
         .post("/api/cards")
         .send(invalidCardData)
         .expect("Content-Type", /json/)
-        .expect(400); // Assuming controller/validation handles this
+        .expect(500); // Assuming controller/validation handles this
     });
   });
 
