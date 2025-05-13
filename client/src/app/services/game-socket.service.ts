@@ -73,4 +73,27 @@ export class GameSocketService {
   clearVote(): void {
     this.socket.emit('clearMyVote');
   }
+
+  requestRevealEstimations(): void {
+    this.socket.emit('requestRevealEstimations', {});
+  }
+  setCurrentTask(taskId: string): void {
+    this.socket.emit('setCurrentTaskRequest', {
+      taskId,
+    });
+  }
+
+  nextTask(): void {
+    this.socket.emit('nextTaskRequest', {});
+  }
+  resetCurrentTaskVotes(): void {
+    this.socket.emit('resetCurrentTaskVotesRequest', {});
+  }
+
+  addNewTask(taskName: string, taskDescription?: string): void {
+    this.socket.emit('addNewTaskRequest', {
+      taskName,
+      taskDescription,
+    });
+  }
 }

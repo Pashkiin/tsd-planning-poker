@@ -28,7 +28,8 @@ export class SessionComponent {
   selectedCardValue: number | string | null = null;
 
   playerId: string | null = null;
-  sessionState: GameSession | null = null; // To hold the initial session state
+  sessionState: GameSession | null = null;
+  isCreator: boolean = false;
 
   constructor(
     private gameSocketService: GameSocketService,
@@ -50,7 +51,12 @@ export class SessionComponent {
       if (sessionState) {
         this.sessionState = sessionState; // Store initial session state once received
         console.log('Session State:', sessionState);
-        // Optionally, you can update the UI with the sessionState here
+        this.isCreator =
+          this.authService.getUserId() === this.sessionState?.creatorId;
+        console.log('Session Creator ID:', this.sessionState?.creatorId);
+        console.log('current User ID:', this.authService.getUserId());
+        console.log('Player ID:', this.playerId);
+        console.log('Is Creator:', this.isCreator);
       }
     });
   }
@@ -120,5 +126,43 @@ export class SessionComponent {
     return this.sessionState?.tasks.find(
       (task) => task.id === this.sessionState?.currentTaskId
     );
+  }
+  // Request to reveal all estimations for the current task
+  requestRevealEstimations() {
+    this.gameSocketService.requestRevealEstimations();
+  }
+
+  // Set a new current task for voting
+  setCurrentTask(taskId: string) {
+    this.gameSocketService.setCurrentTask(taskId);
+  }
+
+  // Move to the next task in the session's task list
+  nextTask() {
+    this.gameSocketService.nextTask();
+  }
+
+  // Reset votes for the current task
+  resetCurrentTaskVotes() {
+    this.gameSocketService.resetCurrentTaskVotes();
+  }
+
+  // Add a new task to the session's task list
+  addNewTask() {
+    const newTaskName = prompt('Enter the new task name:');
+    const newTaskDescription = prompt('Enter the task description (optional):');
+
+    if (newTaskName) {
+      this.gameSocketService.addNewTask(newTaskName, newTaskDescription!);
+    }
+  }
+
+  objectKeys(obj: any): string[] {
+    return Object.keys(obj);
+  }
+
+  // Pomocnicza metoda, aby zwrócić pary [klucz, wartość]
+  objectEntries(obj: any): [string, number][] {
+    return Object.entries(obj);
   }
 }

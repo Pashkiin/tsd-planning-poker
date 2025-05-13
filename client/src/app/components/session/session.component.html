@@ -44,17 +44,57 @@
     <div *ngIf="sessionState.currentTaskId">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">{{ sessionState.currentTaskName }}</h5>
+                <h5 class="card-title">{{ getCurrentTask()?.name }}</h5>
                 <p class="card-text">
-                    <strong>Status:</strong> {{ sessionState.currentTaskStatus | titlecase }}
+                    <strong>Status:</strong> {{ getCurrentTask()?.status | titlecase }}
                 </p>
 
-                <div *ngIf="sessionState.currentTaskStatus === 'active'">
-                    <p><strong>Średnia ocena:</strong> {{ getCurrentTask()?.averageEstimation }}</p>
+                <div *ngIf="getCurrentTask()?.status === 'active'">
+                    <p>
+                        <strong>Średnia ocena:</strong>
+                        {{ getCurrentTask()?.averageEstimation || 'Czekam na oceny' }}
+                    </p>
                 </div>
 
-                <div *ngIf="sessionState.currentTaskStatus === 'estimated'">
-                    <p><strong>Oceny ujawnione</strong></p>
+                <div *ngIf="getCurrentTask()?.status === 'estimated'" class="task-estimated">
+                    <p class="task-header"><strong>Średnia ocena:</strong></p>
+                    <p class="average-estimation">{{ getCurrentTask()?.averageEstimation }}</p>
+
+                    <p *ngIf="getCurrentTask()?.status === 'estimated'" class="votes-title">
+                        <strong>Głosy:</strong>
+                    </p>
+
+                    <ul>
+                        <li *ngFor="let entry of objectEntries(sessionState.currentTaskEstimations)">
+                            Player {{ entry[0] }} - {{ entry[1] }}
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Buttons for Game Creator -->
+                <div *ngIf="isCreator">
+                    <div class="mt-4 d-flex gap-2">
+                        <button class="btn btn-info" (click)="requestRevealEstimations()">Ujawnij oceny</button>
+                        <button class="btn btn-secondary" (click)="nextTask()">Przejdź do następnego zadania</button>
+                        <button class="btn btn-warning" (click)="resetCurrentTaskVotes()">Resetuj głosy</button>
+                        <button class="btn btn-success" (click)="addNewTask()">Dodaj nowe zadanie</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- List of Tasks -->
+    <h3 class="mt-4">Lista zadań</h3>
+    <div class="list-group">
+        <div *ngFor="let task of sessionState.tasks">
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ task.name }}</strong>
+                    <p>Status: {{ task.status | titlecase }}</p>
+                </div>
+                <div *ngIf="isCreator">
+                    <button class="btn btn-primary btn-sm" (click)="setCurrentTask(task.id)">Ustaw jako bieżące</button>
                 </div>
             </div>
         </div>
