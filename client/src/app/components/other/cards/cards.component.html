@@ -1,0 +1,9 @@
+<div class="row row-cols-2 row-cols-md-4 g-3">
+    <div class="col" *ngFor="let card of cards">
+        <div class="card text-center p-3 shadow-sm" [class.border-primary]="card.value === selectedCardValue"
+            (click)="selectCard(card)" style="cursor: pointer;">
+            <h5 class="mb-1">{{ card.label }}</h5>
+            <small *ngIf="card.description">{{ card.description }}</small>
+        </div>
+    </div>
+</div>

@@ -44,7 +44,13 @@ export class LoginComponent {
     this.authService.login(username).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/game']);
+        const redirectUrl = this.authService.getRedirectUrl();
+        console.log('Redirect URL:', redirectUrl);
+        if (redirectUrl) {
+          this.router.navigateByUrl(redirectUrl);
+        } else {
+          this.router.navigate(['/lobby']);
+        }
       },
       error: (err) => {
         this.isLoading = false;

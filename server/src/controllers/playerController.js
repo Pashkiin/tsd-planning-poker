@@ -1,34 +1,44 @@
-const { addPlayer, getPlayers, removePlayer } = require("../gameLogic/gameLogic");
+const gameLogic = require("../gameLogic/gameLogic");
 
 const loginPlayer = (req, res) => {
-    const { username } = req.body;
-    if (!username) return res.status(400).json({ error: "Brak nazwy użytkownika" });
-
-    const player = addPlayer(username);
-    res.json({ userId: player.id });
+  const { username } = req.body;
+  if (!username) {
+    return res.status(400).json({ error: "Brak nazwy użytkownika" });
+  }
+  const tempPlayerProfileId = `user_${Math.random()
+    .toString(36)
+    .substring(2, 9)}`;
+  console.log(
+    `User '${username}' logged in, assigned temporary profile ID: ${tempPlayerProfileId}`
+  );
+  res.json({ userId: tempPlayerProfileId, username: username });
 };
 
-const fetchPlayers = (_req, res) => {
-    res.json({ players: getPlayers() });
+const fetchPlayersInSession = (req, res) => {
+  const { sessionId } = req.query;
+  if (!sessionId) {
+    return res
+      .status(400)
+      .json({ error: "Session ID is required to fetch players." });
+  }
+  const players = gameLogic.getPlayers(sessionId);
+  if (players) {
+    res.json({
+      players: players.map((p) => ({
+        id: p.id,
+        username: p.username,
+        selectedCardValue: p.selectedCardValue,
+        hasLockedVote: p.hasLockedVote,
+      })),
+    });
+  } else {
+    res
+      .status(404)
+      .json({ error: "Session not found or no players in session." });
+  }
 };
-
-const removePlayerFromSession = (req, res) => {
-    const { userId } = req.params;
-    if (!userId) {
-        return res.status(400).json({ error: "Brak userId" });
-    }
-
-    const success = removePlayer(userId);
-    if (!success) {
-        return res.status(404).json({ error: "Gracz nie znaleziony" });
-    }
-
-    res.status(200).json({ success: true });
-};
-
 
 module.exports = {
-    loginPlayer,
-    fetchPlayers,
-    removePlayerFromSession,
+  loginPlayer,
+  fetchPlayersInSession,
 };

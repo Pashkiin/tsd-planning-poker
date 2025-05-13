@@ -10,6 +10,7 @@ import {
 } from 'rxjs';
 import { Router } from '@angular/router';
 import { LoginResponse } from '../models/login-response.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -17,12 +18,18 @@ import { LoginResponse } from '../models/login-response.model';
 export class AuthService {
   private apiUrl = '/api/player/login';
   private userKey = 'planning_poker_user_id';
-  private logoutUrl = '/api/player/delete'
+  private userNameKey = 'planning_poker_user_name';
+  private logoutUrl = '/api/player/delete';
+  private redirectUrlKey = 'redirect_url';
 
   private loggedIn = new BehaviorSubject<boolean>(this.hasUserId());
   isLoggedIn$ = this.loggedIn.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   private hasUserId(): boolean {
     return !!localStorage.getItem(this.userKey);
@@ -30,6 +37,10 @@ export class AuthService {
 
   getUserId(): string | null {
     return localStorage.getItem(this.userKey);
+  }
+
+  getUserName(): string | null {
+    return localStorage.getItem(this.userNameKey);
   }
 
   login(username: string): Observable<LoginResponse> {
@@ -40,6 +51,7 @@ export class AuthService {
       tap((response) => {
         if (response && response.userId) {
           localStorage.setItem(this.userKey, response.userId);
+          localStorage.setItem(this.userNameKey, username);
           this.loggedIn.next(true);
           console.log('Login successful, userId:', response.userId);
         } else {
@@ -60,7 +72,7 @@ export class AuthService {
   logout(): void {
     const userId = localStorage.getItem(this.userKey);
     if (!userId) {
-      console.error("Brak userId");
+      console.error('Brak userId');
       return;
     }
 
@@ -69,7 +81,7 @@ export class AuthService {
       error: (err) => {
         console.error('Błąd przy usuwaniu gracza z sesji:', err);
         this.finalizeLogout(); // nawet jeśli błąd, wyloguj lokalnie
-      }
+      },
     });
   }
 
@@ -77,5 +89,22 @@ export class AuthService {
     localStorage.removeItem(this.userKey);
     this.loggedIn.next(false);
     this.router.navigate(['/login']);
+  }
+
+  setRedirectUrl(url: string) {
+    localStorage.setItem(this.redirectUrlKey, url);
+  }
+
+  getRedirectUrl(): string | null {
+    return localStorage.getItem(this.redirectUrlKey);
+  }
+
+  getSessionIdFromUrl(): string | null {
+    const match = this.router.url.match(/\/session\/([^\/]+)/);
+    return match ? match[1] : null;
+  }
+
+  clearRedirectUrl() {
+    return localStorage.removeItem(this.redirectUrlKey);
   }
 }
