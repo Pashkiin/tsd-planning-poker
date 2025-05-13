@@ -1,18 +1,25 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const gameController = require('../controllers/gameController');
+const gameController = require("../controllers/gameController");
 
-router.post('/vote', (req, res) => {
-    gameController.voteCard(req, res);
-});
+// POST /api/game/vote - Player votes in a specific session
+// Body: { sessionId, userId, cardValue }
+router.post("/vote", gameController.voteCard);
 
-router.get('/session', (req, res) => {
-    gameController.getGameSession(req, res);
-});
+// GET /api/game/session?sessionId=xxx - Get full state of a specific game session
+// This might be superseded by GET /api/sessions/:sessionId
+router.get("/session", gameController.getGameSessionDetails);
 
-router.post('/task', (req, res) => {
-    gameController.updateTask(req, res);
-});
-router.post('/reset', gameController.resetVotesHandler);
+// POST /api/game/task - Set/update the current task for a session
+// Body: { sessionId, taskId } or { sessionId, taskName, taskDescription }
+router.post("/task", gameController.updateTaskForSession);
+
+// POST /api/game/reset - Reset votes for the current task in a session
+// Body: { sessionId }
+router.post("/reset", gameController.resetVotesHandler);
+
+// POST /api/game/reveal - Creator reveals votes for the current task
+// Body: { sessionId, userId (creator's ID) }
+router.post("/reveal", gameController.revealVotesHandler);
 
 module.exports = router;

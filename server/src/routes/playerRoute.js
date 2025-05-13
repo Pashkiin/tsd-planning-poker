@@ -1,17 +1,11 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const playerController = require('../controllers/playerController.js');
+const playerController = require("../controllers/playerController.js");
 
-router.post('/login', (req, res) => {
-    playerController.loginPlayer(req, res);
-});
+// POST /api/player/login - User logs in (gets a user profile ID)
+router.post("/login", playerController.loginPlayer);
 
-router.get('/players', (req, res) => {
-    playerController.fetchPlayers(req, res);
-});
-
-router.delete('/delete/:userId', (req,res) =>{
-    playerController.removePlayerFromSession(req,res)
-})
+// GET /api/player/players?sessionId=xxx - Fetches players for a specific session
+router.get("/players", playerController.fetchPlayersInSession);
 
 module.exports = router;
