@@ -1,4 +1,3 @@
-// Deck of cards voting component
 <div class="container mt-4">
     <h2>Wybierz kartę</h2>
 
@@ -37,4 +36,27 @@
     <ng-template #loading>
         <div class="text-muted">Ładowanie kart...</div>
     </ng-template>
+</div>
+
+<div class="mt-4" *ngIf="sessionState">
+    <h3>Aktualne zadanie</h3>
+
+    <div *ngIf="sessionState.currentTaskId">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ sessionState.currentTaskName }}</h5>
+                <p class="card-text">
+                    <strong>Status:</strong> {{ sessionState.currentTaskStatus | titlecase }}
+                </p>
+
+                <div *ngIf="sessionState.currentTaskStatus === 'active'">
+                    <p><strong>Średnia ocena:</strong> {{ getCurrentTask()?.averageEstimation }}</p>
+                </div>
+
+                <div *ngIf="sessionState.currentTaskStatus === 'estimated'">
+                    <p><strong>Oceny ujawnione</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

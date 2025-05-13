@@ -7,9 +7,8 @@ import { Observable } from 'rxjs';
 import { BehaviorSubject, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Card } from '../../models/card.model'; // Adjust path
-import { Player } from '../../models/player.model'; // Adjust path
-import { GameSession } from '../../models/game-session.model'; // Adjust path
 import { CardService } from '../../services/card.service'; // Adjust path
+import { GameSession, Player, Task } from '../../models/session-state.model'; // Adjust path
 
 @Component({
   selector: 'app-session',
@@ -28,6 +27,9 @@ export class SessionComponent {
   isLoadingCards = false;
   selectedCardValue: number | string | null = null;
 
+  playerId: string | null = null;
+  sessionState: GameSession | null = null; // To hold the initial session state
+
   constructor(
     private gameSocketService: GameSocketService,
     private sessionService: SessionService,
@@ -36,6 +38,21 @@ export class SessionComponent {
   ) {
     // Get socket connection status from GameSocketService
     this.socketReady$ = this.gameSocketService.getSessionConnected();
+
+    this.gameSocketService.playerId$.subscribe((playerId) => {
+      if (playerId) {
+        this.playerId = playerId; // Store playerId once received
+        console.log('Player ID:', playerId);
+      }
+    });
+
+    this.gameSocketService.sessionState$.subscribe((sessionState) => {
+      if (sessionState) {
+        this.sessionState = sessionState; // Store initial session state once received
+        console.log('Session State:', sessionState);
+        // Optionally, you can update the UI with the sessionState here
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -97,5 +114,11 @@ export class SessionComponent {
     this.isConfirmed = false;
     this.selectedCardValue = null;
     this.gameSocketService.clearVote();
+  }
+
+  getCurrentTask() {
+    return this.sessionState?.tasks.find(
+      (task) => task.id === this.sessionState?.currentTaskId
+    );
   }
 }
