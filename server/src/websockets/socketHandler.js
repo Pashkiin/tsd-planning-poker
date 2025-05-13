@@ -10,6 +10,7 @@ function initializeWebSocket(io, socket) {
   socket.on("joinSession", async (data) => {
     const { sessionId, userId, username } = data;
     console.log(`➡️ Received joinSession request:`, data);
+    socket.userId = userId;
 
     if (!sessionId || !userId || !username) {
       socket.emit("joinError", {
@@ -201,17 +202,17 @@ function initializeWebSocket(io, socket) {
     }
 
     // Check if the requesting player is the creator of the session
-    if (session.creatorId !== playerId) {
+    if (session.creatorId !== socket.userId) {
       socket.emit("revealError", {
         message: "Only the session creator can reveal estimations.",
       });
       console.warn(
-        `Player ${playerId} (not creator ${session.creatorId}) attempted to reveal votes in session ${sessionId}.`
+        `Player ${playerId} ${socket.userId} (not creator ${session.creatorId}) attempted to reveal votes in session ${sessionId}.`
       );
       return;
     }
 
-    const revealResult = sessionManager.revealEstimations(sessionId, playerId);
+    const revealResult = sessionManager.revealEstimations(sessionId, socket.userId);
 
     if (revealResult) {
       console.log(
@@ -252,7 +253,7 @@ function initializeWebSocket(io, socket) {
       socket.emit("taskError", { message: "Session not found." });
       return;
     }
-    if (session.creatorId !== playerId) {
+    if (session.creatorId !== socket.userId) {
       socket.emit("taskError", {
         message: "Only the session creator can change the task.",
       });
@@ -286,7 +287,7 @@ function initializeWebSocket(io, socket) {
       socket.emit("taskError", { message: "Session not found." });
       return;
     }
-    if (session.creatorId !== playerId) {
+    if (session.creatorId !== socket.userId) {
       socket.emit("taskError", {
         message: "Only the session creator can advance to the next task.",
       });
@@ -333,7 +334,7 @@ function initializeWebSocket(io, socket) {
       socket.emit("taskError", { message: "Session not found." });
       return;
     }
-    if (session.creatorId !== playerId) {
+    if (session.creatorId !== socket.userId) {
       socket.emit("taskError", {
         message: "Only the session creator can reset votes for the task.",
       });
@@ -374,7 +375,7 @@ function initializeWebSocket(io, socket) {
       socket.emit("taskError", { message: "Session not found." });
       return;
     }
-    if (session.creatorId !== playerId) {
+    if (session.creatorId !== socket.userId) {
       socket.emit("taskError", {
         message: "Only the session creator can add tasks.",
       });

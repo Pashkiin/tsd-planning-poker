@@ -16,6 +16,7 @@ import { Card } from '../../models/card.model';
 import { Player } from '../../models/player.model';
 import { GameSession } from '../../models/game-session.model';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router'; // Import do obsługi routingu
 
 @Component({
   selector: 'app-game',
@@ -43,7 +44,9 @@ export class GameComponent implements OnInit, OnDestroy {
   constructor(
     private cardService: CardService,
     private authService: AuthService,
-    private gameService: GameService
+    private gameService: GameService,
+    private router: Router, // Router dla nawigacji
+    private route: ActivatedRoute // ActivatedRoute dla sesji
   ) {
     this.averageVote$ = this.sessionData.pipe(
       map((session) => {
@@ -70,6 +73,14 @@ export class GameComponent implements OnInit, OnDestroy {
     this.currentUserId = this.authService.getUserId();
     this.loadCards();
     this.startPollingSession();
+
+    // Pobranie ID sesji z URL (jeśli sesja już istnieje)
+    this.route.paramMap.subscribe((params) => {
+      const sessionId = params.get('sessionId');
+      if (sessionId) {
+        this.loadSessionData(sessionId);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -92,6 +103,21 @@ export class GameComponent implements OnInit, OnDestroy {
       })
     );
     this.cards$.subscribe(() => (this.isLoadingCards = false));
+  }
+
+  loadSessionData(sessionId: string): void {
+    this.isLoadingSession = true;
+    this.gameService.getSession().subscribe({
+      next: (session) => {
+        this.isLoadingSession = false;
+        this.sessionData.next(session);
+      },
+      error: (err) => {
+        this.isLoadingSession = false;
+        this.error = 'Failed to load session data.';
+        console.error(err);
+      },
+    });
   }
 
   startPollingSession(): void {
@@ -182,6 +208,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.authService.logout();
   }
 
+  // Task name edit logic
   isEditingTaskName = false;
   taskName = '';
 
@@ -210,8 +237,6 @@ export class GameComponent implements OnInit, OnDestroy {
     });
   }
 
-
-  //Resets players estimations
   startNewRound(): void {
     this.isConfirmed = false;
     this.selectedCard.next(null);
