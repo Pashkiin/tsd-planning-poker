@@ -38,6 +38,30 @@
     </ng-template>
 </div>
 
+
+<div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Gracz</th>
+                <th>Głosuje</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let player of sessionState?.players">
+                <td>{{ player.username }}</td>
+                <td>
+                    <span class="badge" [ngClass]="player.hasLockedVote ? 'bg-success' : 'bg-danger'">
+                        {{ player.hasLockedVote ? 'Tak' : 'Nie' }}
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
 <div class="mt-4" *ngIf="sessionState">
     <h3>Aktualne zadanie</h3>
 
