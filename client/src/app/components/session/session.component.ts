@@ -32,6 +32,9 @@ export class SessionComponent {
   isCreator: boolean = false;
   sessionEnded = false;
 
+  showLink = false;
+  currentGameLink: string = '';
+
   constructor(
     private gameSocketService: GameSocketService,
     private sessionService: SessionService,
@@ -177,5 +180,28 @@ export class SessionComponent {
     if (allVoted) {
       this.requestRevealEstimations();
     }
+  }
+
+  copyLinkToClipboard(): void {
+    // Możesz dynamicznie tworzyć link – np. na podstawie ID rozgrywki
+    const sessionId = this.sessionState?.sessionId || '123'; // Zakładam, że masz sessionState.id
+    this.currentGameLink = `${window.location.origin}/session/${sessionId}`;
+
+    navigator.clipboard
+      .writeText(this.currentGameLink)
+      .then(() => {
+        console.log('Link skopiowany do schowka');
+      })
+      .catch((err) => {
+        console.error('Nie udało się skopiować linku', err);
+      });
+  }
+
+  toggleLinkVisibility(): void {
+    this.showLink = !this.showLink;
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }
