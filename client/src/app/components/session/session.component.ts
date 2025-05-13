@@ -30,6 +30,7 @@ export class SessionComponent {
   playerId: string | null = null;
   sessionState: GameSession | null = null;
   isCreator: boolean = false;
+  sessionEnded = false;
 
   constructor(
     private gameSocketService: GameSocketService,
@@ -58,6 +59,7 @@ export class SessionComponent {
         console.log('Player ID:', this.playerId);
         console.log('Is Creator:', this.isCreator);
       }
+      this.checkVotesAndEndSession();
     });
   }
 
@@ -164,5 +166,16 @@ export class SessionComponent {
   // Pomocnicza metoda, aby zwrócić pary [klucz, wartość]
   objectEntries(obj: any): [string, number][] {
     return Object.entries(obj);
+  }
+
+  checkVotesAndEndSession(): void {
+    if (this.sessionState?.areVotesRevealedForCurrentTask) return;
+
+    const allVoted =
+      this.sessionState?.totalPlayers === this.sessionState?.lockedVotesCount;
+
+    if (allVoted) {
+      this.requestRevealEstimations();
+    }
   }
 }

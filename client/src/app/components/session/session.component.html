@@ -40,12 +40,13 @@
 
 
 <div>
-
+    <h2 class="mt-4">Stan sesji</h2>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Gracz</th>
                 <th>Głosuje</th>
+                <th>Wynik</th>
             </tr>
         </thead>
         <tbody>
@@ -54,6 +55,14 @@
                 <td>
                     <span class="badge" [ngClass]="player.hasLockedVote ? 'bg-success' : 'bg-danger'">
                         {{ player.hasLockedVote ? 'Tak' : 'Nie' }}
+                    </span>
+                </td>
+                <td>
+                    <span *ngIf="getCurrentTask()?.status === 'estimated'" class="badge bg-primary">
+                        {{ player.selectedCardValue }}
+                    </span>
+                    <span *ngIf="getCurrentTask()?.status === 'active'" class="badge bg-secondary">
+                        Głos Tajny
                     </span>
                 </td>
             </tr>
