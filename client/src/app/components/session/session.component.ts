@@ -26,9 +26,11 @@ export class SessionComponent {
 
   ngOnInit(): void {
     var sessionId;
+    console.log(this.authService.getRedirectUrl());
     if (this.authService.getRedirectUrl() != null) {
       console.log('Redirect URL:', this.authService.getRedirectUrl());
-      sessionId = this.authService.getSessionId();
+      sessionId = this.authService.getSessionIdFromUrl();
+      console.log('Session ID:', sessionId);
       this.authService.clearRedirectUrl();
     } else {
       sessionId = this.sessionService.getSessionId();

@@ -20,6 +20,7 @@ export class AuthService {
   private userKey = 'planning_poker_user_id';
   private userNameKey = 'planning_poker_user_name';
   private logoutUrl = '/api/player/delete';
+  private redirectUrlKey = 'redirect_url';
 
   private loggedIn = new BehaviorSubject<boolean>(this.hasUserId());
   isLoggedIn$ = this.loggedIn.asObservable();
@@ -90,21 +91,20 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  private redirectUrl: string | null = null;
-
   setRedirectUrl(url: string) {
-    this.redirectUrl = url;
+    localStorage.setItem(this.redirectUrlKey, url);
   }
 
   getRedirectUrl(): string | null {
-    return this.redirectUrl;
+    return localStorage.getItem(this.redirectUrlKey);
   }
 
-  getSessionId(): string | null {
-    return this.route.snapshot.paramMap.get('sessionId');
+  getSessionIdFromUrl(): string | null {
+    const match = this.router.url.match(/\/session\/([^\/]+)/);
+    return match ? match[1] : null;
   }
 
   clearRedirectUrl() {
-    this.redirectUrl = null;
+    return localStorage.removeItem(this.redirectUrlKey);
   }
 }

@@ -88,19 +88,31 @@ export class LobbyComponent implements OnInit {
     };
 
     this.sessionService.updateSessionCreate(sessionData);
+
     this.sessionService.createSession(this.userId).subscribe({
       next: (res) => {
+        // Zakładam, że res zawiera nowe sessionId
+        const newSessionId =
+          res.sessionId || this.sessionService.getSessionId();
+
         bootstrap.Modal.getInstance(
           document.getElementById('createSessionModal')!
         )?.hide();
+
         document.body.classList.remove('modal-open');
         document.querySelector('.modal-backdrop')?.remove();
+
         this.sessionService
           .getAllSessions()
           .subscribe((sessions) => (this.sessions = sessions));
+
+        if (newSessionId) {
+          this.joinSession(newSessionId);
+        } else {
+          console.error('No session ID returned');
+        }
       },
       error: (err) => console.error(err),
     });
-    this.joinSession(this.sessionService.getSessionId()!);
   }
 }
