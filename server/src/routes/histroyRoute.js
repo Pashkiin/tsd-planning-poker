@@ -4,6 +4,6 @@ const { getUserHistory,saveEstimationHistory } = require("../controllers/history
 const router = express.Router();
 
 router.get("/:userId", getUserHistory); // GET /api/history/:userId
-router.post("/history", saveEstimationHistory); //POST /api/history
+router.post("/add", saveEstimationHistory); //POST /api/history/add
 
 module.exports = router;
