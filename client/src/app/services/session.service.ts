@@ -126,4 +126,17 @@ export class SessionService {
         })
       );
   }
+
+  exportTasksToCsv(tasks: any[]): Observable<Blob> {
+    return this.http
+      .post('/api/tasks/export-tasks', tasks, {
+        responseType: 'blob',
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('CSV export error:', error);
+          return throwError(() => new Error('Failed to export tasks to CSV.'));
+        })
+      );
+  }
 }
