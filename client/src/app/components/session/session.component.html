@@ -7,6 +7,9 @@
         <button class="btn btn-outline-secondary px-4 py-2" (click)="toggleLinkVisibility()">
             {{ showLink ? 'Ukryj link 🔽' : 'Pokaż link 🔼' }}
         </button>
+        <button class="btn btn-danger px-4 py-2 ms-auto" (click)="exportTasksToCsv()">
+            Eksportuj taski
+        </button>
 
         <button class="btn btn-danger px-4 py-2 ms-auto" (click)="logout()">
             🚪 Wyloguj

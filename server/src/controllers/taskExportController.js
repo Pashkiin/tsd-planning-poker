@@ -36,7 +36,7 @@ router.post('/export-tasks', (req, res) => {
             ''  // Parent summary
         ].join(','));
 
-        // Subtasks (Podzadanie)
+        /* Subtasks (Podzadanie)
         task.subTasks.forEach((subTask) => {
             csvData.push([
                 'Podzadanie',
@@ -48,7 +48,7 @@ router.post('/export-tasks', (req, res) => {
                 task.id,
                 task.name
             ].join(','));
-        });
+        });*/
     });
 
     try {
