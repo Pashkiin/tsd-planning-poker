@@ -1,9 +1,9 @@
 class PlayerModel {
-  constructor(username, socketId = null) {
-    if (!username) {
+  constructor(userId, username, socketId = null) {
+    if (!username || !userId) {
       throw new Error("Username is required for a player.");
     }
-    this.id = Math.random().toString(36).substring(2, 9);
+    this.id = userId;
     this.username = username;
     this.socketId = socketId;
 

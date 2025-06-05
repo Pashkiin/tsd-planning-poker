@@ -33,7 +33,7 @@ class SessionModel {
     }
   }
 
-  addPlayer(username, socketId) {
+  addPlayer(userId, username, socketId) {
     // Prevent duplicate usernames within the same session, or handle rejoining
     const existingPlayer = this.players.find(
       (p) => p.username.toLowerCase() === username.toLowerCase()
@@ -47,7 +47,7 @@ class SessionModel {
       return existingPlayer;
     }
 
-    const player = new PlayerModel(username, socketId);
+    const player = new PlayerModel(userId ,username, socketId);
     this.players.push(player);
     console.log(
       `Player ${username} (ID: ${player.id}, Socket: ${socketId}) added to session ${this.sessionId}`

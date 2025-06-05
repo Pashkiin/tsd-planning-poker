@@ -1,13 +1,13 @@
 const sessionManager = require("./sessionManager");
 
-function addPlayer(sessionId, username, socketId) {
-  if (!sessionId || !username || !socketId) {
+function addPlayer(sessionId,userId, username, socketId) {
+  if (!sessionId || !username || !socketId || !userId) {
     console.error(
-      "sessionId, username, and socketId are required to add a player."
+      "sessionId, username, userId and socketId are required to add a player."
     );
     return null;
   }
-  return sessionManager.addPlayerToSession(sessionId, username, socketId);
+  return sessionManager.addPlayerToSession(sessionId,userId, username, socketId);
 }
 
 function getPlayers(sessionId) {
