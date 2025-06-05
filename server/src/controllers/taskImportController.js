@@ -5,7 +5,7 @@ const fs = require("fs");
 const { TaskModel } = require("../models/taskModel.js");
 
 const router = express.Router();
-const upload = multer({ dest: "tmp/" });
+const upload = multer({ dest: "../../tmp/" });
 
 // Nagłówki CSV, które są zawsze takie same
 const headers = [
