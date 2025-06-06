@@ -1,6 +1,6 @@
 [build]
   functions = "functions"
-  publish = "public" # if you have a frontend
+  publish = "."  # no frontend, just backend code
 
 [[redirects]]
   from = "/api/*"
