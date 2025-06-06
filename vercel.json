@@ -13,6 +13,5 @@
         { "key": "Cache-Control", "value": "max-age=0, must-revalidate" }
       ]
     }
-  ],
-  "installCommand": "npm install --prefix client && npm install --prefix server"
+  ]
 }
