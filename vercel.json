@@ -3,6 +3,31 @@
     {
       "source": "/api/:path*",
       "destination": "https://poker-server-git-main-pashkins-projects.vercel.app/api/:path*"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "max-age=0, must-revalidate" }
+      ]
     }
-  ]
+  ],
+  "builds": [
+    {
+      "src": "client/package.json",
+      "use": "@vercel/angular@6.2.2",
+      "config": {
+        "outputDirectory": "dist/client"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "client/dist/client/$1"
+    }
+  ],
+  "installCommand": "npm install --prefix client && npm install --prefix server"
 }
