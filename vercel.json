@@ -23,11 +23,5 @@
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "client/dist/client/$1"
-    }
-  ],
   "installCommand": "npm install --prefix client && npm install --prefix server"
 }
