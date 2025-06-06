@@ -29,3 +29,4 @@ yarn-error.log*
 
 # Jest cache
 .jest-cache/
+.vercel

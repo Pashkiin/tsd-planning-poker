@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://poker-server-omega.vercel.app/",
+    "target": "https://poker-server-git-main-pashkins-projects.vercel.app",
     "secure": false,
     "logLevel": "debug"
   }

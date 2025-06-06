@@ -11,7 +11,7 @@ import { importProvidersFrom } from '@angular/core';
 import { routes } from './app.routes';
 
 const socketConfig: SocketIoConfig = {
-  url: 'https://poker-server-omega.vercel.app/',
+  url: 'https://poker-server-git-main-pashkins-projects.vercel.app',
   options: {
     transports: ['websocket'],
   },
