@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/api"
+  to = "https://poker-server-git-main-pashkins-projects.vercel.app"
+  status = 200
+  force = true
