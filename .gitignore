@@ -17,6 +17,7 @@ client/.env # If client uses specific env files
 *.iml
 *.DS_Store
 Thumbs.db
+uploads/
 
 # Log files
 *.log
