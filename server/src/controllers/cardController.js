@@ -41,10 +41,16 @@ exports.updateCard = async (req, res) => {
     const { id } = req.params;
     const { value, label, description, isSpecial, color } = req.body;
 
+
     try {
         const updatedCard = await Card.findByIdAndUpdate(id, { value, label, description, isSpecial, color }, { new: true });
         if (!updatedCard) {
             return res.status(404).json({ message: "Karta do edytowania nie istnieje." });
+        }
+        if (value == null || label == null || label.trim() === "") {
+            return res.status(400).json({
+                message: "Pola 'value' i 'label' są wymagane i nie mogą być puste.",
+            });
         }
         res.status(200).json(updatedCard);
     } catch (error) {

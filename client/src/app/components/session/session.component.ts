@@ -204,4 +204,25 @@ export class SessionComponent {
   logout(): void {
     this.authService.logout();
   }
+
+  exportTasksToCsv(): void {
+    if (!this.sessionState || !this.sessionState.tasks) {
+      console.error('No tasks to export.');
+      return;
+    }
+
+    this.sessionService.exportTasksToCsv(this.sessionState.tasks).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'tasks.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Błąd eksportu CSV:', err.message);
+      },
+    });
+  }
 }

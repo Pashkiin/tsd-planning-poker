@@ -9,6 +9,9 @@ const sessionRouter = require("./src/routes/sessionRoute");
 const userRoute = require("./src/routes/userRoute");
 const authRoute = require("./src/routes/authRoute");
 const historyRoute = require("./src/routes/histroyRoute");
+
+const taskimportRouter = require("./src/routes/taskRoute")
+
 const app = express();
 
 //API middlewares
@@ -26,5 +29,7 @@ app.use("/api/sessions", sessionRouter);
 app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/history", historyRoute);
+app.use("/api/tasks", taskimportRouter)
+
 
 module.exports = app;
