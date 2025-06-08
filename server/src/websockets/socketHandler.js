@@ -34,6 +34,7 @@ function initializeWebSocket(io, socket) {
     // Add player to the session model or update socketId if rejoining
     const player = sessionManager.addPlayerToSession(
       sessionId,
+      userId,
       username,
       socket.id
     );
