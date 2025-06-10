@@ -1,9 +1,9 @@
 <div class="estimation-history-container">
-    <h2>Historia Estymacji</h2>
+    <h2>Estimation History</h2>
 
     <div *ngIf="loading" class="loading">
         <div class="spinner-border" role="status">
-            <span class="visually-hidden">Ładowanie...</span>
+            <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 
@@ -12,7 +12,7 @@
     </div>
 
     <div *ngIf="!loading && !error && estimationHistory.length === 0" class="alert alert-info">
-        Brak historii estymacji.
+        No estimation history.
     </div>
 
     <div *ngIf="!loading && !error && estimationHistory.length > 0" class="history-list">
@@ -22,10 +22,10 @@
                 <div class="d-flex align-items-center gap-2">
                     <small class="text-muted">{{ formatDate(item.date) }}</small>
                     <button class="btn btn-outline-danger btn-sm" (click)="confirmDelete(item)"
-                        [disabled]="isDeleting(item._id || '')" title="Usuń estymację">
+                        [disabled]="isDeleting(item._id || '')" title="Delete estimation">
                         <span *ngIf="isDeleting(item._id || '')" class="spinner-border spinner-border-sm me-1"></span>
                         <i class="fas fa-trash" *ngIf="!isDeleting(item._id || '')"></i>
-                        {{ isDeleting(item._id || '') ? 'Usuwam...' : 'Delete' }}
+                        {{ isDeleting(item._id || '') ? 'Deleting...' : 'Delete' }}
                     </button>
                 </div>
             </div>
@@ -33,15 +33,15 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Sesja:</strong> {{ item.sessionId }}</p>
-                        <p><strong>Twoja karta:</strong>
+                        <p><strong>Session:</strong> {{ item.sessionId }}</p>
+                        <p><strong>Your card:</strong>
                             <span class="badge bg-primary">{{ item.selectedCardValue }}</span>
                         </p>
-                        <p><strong>Uczestnicy:</strong> {{ item.teammates.join(', ') }}</p>
+                        <p><strong>Teammates:</strong> {{ item.teammates.join(', ') }}</p>
                     </div>
 
                     <div class="col-md-6">
-                        <p><strong>Wszystkie głosy:</strong></p>
+                        <p><strong>All votes:</strong></p>
                         <div class="votes-container">
                             <span *ngFor="let vote of item.allVotes" class="badge me-1 mb-1"
                                 [class.bg-success]="vote.card === item.selectedCardValue"
@@ -49,7 +49,7 @@
                                 {{ vote.username }}: {{ vote.card }}
                             </span>
                         </div>
-                        <p class="mt-2"><strong>Podsumowanie:</strong> {{ getVotesSummary(item.allVotes) }}</p>
+                        <p class="mt-2"><strong>Summary:</strong> {{ getVotesSummary(item.allVotes) }}</p>
                     </div>
                 </div>
             </div>
@@ -58,10 +58,10 @@
 
     <div class="d-flex gap-2">
         <button class="btn btn-outline-primary" (click)="loadEstimationHistory()">
-            Odśwież historię
+            Refresh history
         </button>
         <button class="btn btn-secondary" (click)="navigateToSessionList()">
-            Powrót do lobby
+            Back to lobby
         </button>
     </div>
 </div>

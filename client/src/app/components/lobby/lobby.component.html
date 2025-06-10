@@ -7,8 +7,8 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-                    <h5 class="mb-0">🎮 Aktywne sesje</h5>
-                    <button class="btn btn-light btn-sm" (click)="createSession()">➕ Stwórz sesję</button>
+                    <h5 class="mb-0">🎮 Active sessions</h5>
+                    <button class="btn btn-light btn-sm" (click)="createSession()">➕ Create session</button>
                 </div>
 
                 <ul class="list-group list-group-flush" *ngIf="sessions.length; else noSessions">
@@ -17,16 +17,17 @@
                             class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                             <div>
                                 <h6 class="mb-1">{{ session.sessionName }}</h6>
-                                <small class="text-muted">ID sesji: {{ session.sessionId }}</small><br />
-                                <small class="text-muted">Twórca: {{ session.creatorId }}</small><br />
-                                <small class="text-muted">Zadanie: {{ session.currentTaskName }}</small>
+                                <small class="text-muted">Session ID: {{ session.sessionId }}</small><br />
+                                <small class="text-muted">Creator: {{ session.creatorId }}</small><br />
+                                <small class="text-muted">Task: {{ session.currentTaskName }}</small>
                             </div>
                             <div class="text-md-end mt-2 mt-md-0">
                                 <button class="btn btn-primary btn-sm me-2 px-3"
-                                    (click)="joinSession(session.sessionId)">Dołącz</button>
+                                    (click)="joinSession(session.sessionId)">Join</button>
                                 <button class="btn btn-primary btn-sm me-2 px-3"
                                     (click)="copyLinkToClipboard(session.sessionId)">Link</button>
-                                <span class="badge bg-secondary me-2 px-2 py-1">Gracze: {{ session.playerCount }}</span>
+                                <span class="badge bg-secondary me-2 px-2 py-1">Players: {{ session.playerCount
+                                    }}</span>
                             </div>
                         </div>
                     </li>
@@ -34,7 +35,7 @@
 
                 <ng-template #noSessions>
                     <div class="card-body text-center text-muted">
-                        Brak aktywnych sesji.
+                        No active sessions.
                     </div>
                 </ng-template>
             </div>
@@ -47,26 +48,26 @@
         <div class="modal-content">
             <form [formGroup]="sessionForm" (ngSubmit)="onSubmitSessionForm()">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createSessionLabel">Nowa sesja</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                    <h5 class="modal-title" id="createSessionLabel">New session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="sessionName" class="form-label">Nazwa sesji</label>
+                        <label for="sessionName" class="form-label">Session name</label>
                         <input type="text" class="form-control" formControlName="sessionName" required />
                     </div>
                     <div class="mb-3">
-                        <label for="taskName" class="form-label">Nazwa zadania</label>
+                        <label for="taskName" class="form-label">Task name</label>
                         <input type="text" class="form-control" formControlName="taskName" required />
                     </div>
                     <div class="mb-3">
-                        <label for="taskDesc" class="form-label">Opis zadania</label>
+                        <label for="taskDesc" class="form-label">Task description</label>
                         <textarea class="form-control" rows="3" formControlName="taskDescription" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="submit" class="btn btn-primary" [disabled]="sessionForm.invalid">Stwórz</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="sessionForm.invalid">Create</button>
                 </div>
             </form>
         </div>

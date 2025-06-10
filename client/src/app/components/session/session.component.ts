@@ -5,7 +5,7 @@ import { SessionService } from '../../services/session.service'; // Adjust path
 import { AuthService } from '../../services/auth.service'; // If you need authentication
 import { Observable } from 'rxjs';
 import { BehaviorSubject, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Card } from '../../models/card.model'; // Adjust path
 import { CardService } from '../../services/card.service'; // Adjust path
 import { GameSession, Player, Task } from '../../models/session-state.model'; // Adjust path
@@ -113,6 +113,9 @@ export class SessionComponent {
     this.isLoadingCards = true;
     this.error = null;
     this.cards$ = this.cardService.getCards().pipe(
+      map((cards) =>
+        cards.slice().sort((a, b) => Number(a.value) - Number(b.value))
+      ),
       catchError((err) => {
         this.error = `Error loading cards: ${err.message}`;
         console.error(err);
