@@ -8,7 +8,7 @@ const gameRouter = require("./src/routes/gameRoute");
 const sessionRouter = require("./src/routes/sessionRoute");
 const userRoute = require("./src/routes/userRoute");
 const authRoute = require("./src/routes/authRoute");
-const historyRoute = require("./src/routes/histroyRoute");
+const historyRoute = require("./src/routes/historyRoute");
 
 const taskimportRouter = require("./src/routes/taskRoute")
 

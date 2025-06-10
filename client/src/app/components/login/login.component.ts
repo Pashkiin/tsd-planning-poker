@@ -20,6 +20,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   isLoading = false;
   error: string | null = null;
+  isRegisterMode = false;
 
   constructor(
     private fb: FormBuilder,
@@ -28,34 +29,54 @@ export class LoginComponent {
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
+      password: ['', Validators.required],
+      acceptedPolicy: [false],
     });
+  }
+
+  toggleMode(): void {
+    this.isRegisterMode = !this.isRegisterMode;
+    this.error = null;
+
+    const policyControl = this.loginForm.get('acceptedPolicy');
+
+    if (this.isRegisterMode) {
+      policyControl?.setValidators([Validators.requiredTrue]);
+    } else {
+      policyControl?.clearValidators();
+    }
+
+    policyControl?.updateValueAndValidity();
   }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
-      this.error = 'Username is required.';
+      this.error = 'All fields are required.';
       return;
     }
 
     this.isLoading = true;
     this.error = null;
-    const username = this.loginForm.value.username;
 
-    this.authService.login(username).subscribe({
+    const { username, password, acceptedPolicy } = this.loginForm.value;
+
+    const authObservable = this.isRegisterMode
+      ? this.authService.register(username, password, acceptedPolicy)
+      : this.authService.login(username, password);
+
+    authObservable.subscribe({
       next: () => {
         this.isLoading = false;
-        const redirectUrl = this.authService.getRedirectUrl();
-        console.log('Redirect URL:', redirectUrl);
-        if (redirectUrl) {
-          this.router.navigateByUrl(redirectUrl);
-        } else {
-          this.router.navigate(['/lobby']);
-        }
+        const redirectUrl = this.authService.getRedirectUrl() || '/lobby';
+        this.router.navigateByUrl(redirectUrl);
       },
       error: (err) => {
         this.isLoading = false;
-        this.error = err.message || 'An unknown login error occurred.';
-        console.error('Login failed:', err);
+        this.error = err.error?.message || 'An error occurred.';
+        console.error(
+          this.isRegisterMode ? 'Registration failed:' : 'Login failed:',
+          err
+        );
       },
     });
   }

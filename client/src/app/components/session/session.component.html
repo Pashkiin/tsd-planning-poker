@@ -10,6 +10,9 @@
         <button class="btn btn-danger px-4 py-2 ms-auto" (click)="exportTasksToCsv()">
             Eksportuj taski
         </button>
+        <button class="btn btn-secondary px-4 py-2 ms-auto" (click)="backToLobby()">
+            🚪 Back to Lobby
+        </button>
 
         <button class="btn btn-danger px-4 py-2 ms-auto" (click)="logout()">
             🚪 Wyloguj
@@ -129,6 +132,17 @@
                                 Player {{ entry[0] }} - {{ entry[1] }}
                             </li>
                         </ul>
+
+                        <div class="mt-3">
+                            <button class="btn btn-primary" (click)="saveCurrentTaskEstimation()"
+                                [disabled]="isSavingEstimation">
+                                <span *ngIf="isSavingEstimation" class="spinner-border spinner-border-sm me-2"></span>
+                                {{ isSavingEstimation ? 'Zapisuję...' : '💾 Zapisz estymację' }}
+                            </button>
+                            <small class="text-muted ms-2" *ngIf="estimationSaved">
+                                ✅ Estymacja została zapisana
+                            </small>
+                        </div>
                     </div>
 
                     <!-- Buttons for Game Creator -->
@@ -139,6 +153,7 @@
                                 zadania</button>
                             <button class="btn btn-warning" (click)="resetCurrentTaskVotes()">Resetuj głosy</button>
                             <button class="btn btn-success" (click)="addNewTask()">Dodaj nowe zadanie</button>
+                            <button class="btn btn-danger" (click)="confirmEndSession()">Zakończ sesję</button>
                         </div>
                     </div>
                 </div>

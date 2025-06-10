@@ -437,6 +437,20 @@ function initializeWebSocket(io, socket) {
     }
   });
 
+  socket.on("sessionEnd", (sessionId) => {
+    console.log(`Session end requested for session: ${sessionId}`);
+    const session = sessionManager.getSession(sessionId);
+    if (session) {
+      // Remove the session itself
+      sessionManager.endSession(sessionId);
+      console.log(`Session ${sessionId} ended and removed.`);
+      // Powiadom wszystkich w pokoju o końcu sesji
+      io.to(sessionId).emit("sessionEnded", { message: `Session ${sessionId} has ended.`, sessionId });
+    } else {
+      socket.emit("sessionError", { message: `Session ${sessionId} not found.` });
+    }
+  });
+
   // Placeholder for other game-specific events (will be added in next steps)
   // socket.on('playerVote', (data) => { /* ... */ });
   // socket.on('revealVotesRequest', (data) => { /* ... */ });

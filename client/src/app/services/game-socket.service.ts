@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { GameSession, Player } from '../models/session-state.model'; // Adjust path
 
 @Injectable({
@@ -47,8 +47,24 @@ export class GameSocketService {
     this.socket.on('sessionUpdate', (sessionState: GameSession) => {
       this.sessionStateSubject.next(sessionState); // Update sessionState
     });
+
+    this.socket.on('sessionEnd', (data: { message: string }) => {
+      console.log('Session ended:', data.message);
+      this.sessionStateSubject.next(null); // Clear session state on end
+      this.playerIdSubject.next(null); // Clear playerId on end
+    });
   }
 
+  connectToSocket(): void {
+    if (!this.socket.connected) {
+      this.socket.connect();
+    }
+  }
+  disconnectFromSocket(): void {
+    if (this.socket.connected) {
+      this.socket.disconnect();
+    }
+  }
   // Emit joinSession event to the server
   joinSession(sessionId: string, userId: string, username: string): void {
     this.socket.emit('joinSession', {
@@ -94,6 +110,25 @@ export class GameSocketService {
     this.socket.emit('addNewTaskRequest', {
       taskName,
       taskDescription,
+    });
+  }
+  removePlayerFromSession(sessionId: string, playerId: string): void {
+    this.socket.emit('removePlayerFromSession', {
+      sessionId,
+      playerId,
+    });
+    this.socket.disconnect();
+  }
+
+  endSession(sessionId: string): void {
+    this.socket.emit('sessionEnd', sessionId);
+  }
+
+  onSessionEnded(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('sessionEnded', (data: any) => {
+        observer.next(data);
+      });
     });
   }
 }

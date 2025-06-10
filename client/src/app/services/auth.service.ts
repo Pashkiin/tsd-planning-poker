@@ -21,6 +21,7 @@ export class AuthService {
   private userNameKey = 'planning_poker_user_name';
   private logoutUrl = '/api/player/delete';
   private redirectUrlKey = 'redirect_url';
+  private registerUrl = '/api/auth/register';
 
   private loggedIn = new BehaviorSubject<boolean>(this.hasUserId());
   isLoggedIn$ = this.loggedIn.asObservable();
@@ -43,30 +44,80 @@ export class AuthService {
     return localStorage.getItem(this.userNameKey);
   }
 
-  login(username: string): Observable<LoginResponse> {
-    if (!username) {
-      return throwError(() => new Error('Username is required.'));
+  register(
+    username: string,
+    password: string,
+    acceptedPolicy: boolean
+  ): Observable<LoginResponse> {
+    if (!username || !password || !acceptedPolicy) {
+      return throwError(
+        () =>
+          new Error(
+            'All fields including privacy policy acceptance are required.'
+          )
+      );
     }
-    return this.http.post<LoginResponse>(this.apiUrl, { username }).pipe(
-      tap((response) => {
-        if (response && response.userId) {
-          localStorage.setItem(this.userKey, response.userId);
-          localStorage.setItem(this.userNameKey, username);
-          this.loggedIn.next(true);
-          console.log('Login successful, userId:', response.userId);
-        } else {
-          throw new Error('Login failed: Invalid response from server.');
-        }
-      }),
-      catchError((error) => {
-        console.error('Login error:', error);
-        this.loggedIn.next(false);
-        return throwError(
-          () =>
-            new Error('Login failed. Please check username or server status.')
-        );
+
+    return this.http
+      .post<LoginResponse>(this.registerUrl, {
+        username,
+        email: username, // jeśli używasz username jako email
+        password,
+        acceptedPolicy,
       })
-    );
+      .pipe(
+        tap((response) => {
+          if (response && response.userId) {
+            localStorage.setItem(this.userKey, response.userId);
+            localStorage.setItem(this.userNameKey, username);
+            this.loggedIn.next(true);
+            console.log('Registration successful, userId:', response.userId);
+          } else {
+            throw new Error(
+              'Registration failed: Invalid response from server.'
+            );
+          }
+        }),
+        catchError((error) => {
+          console.error('Registration error:', error);
+          this.loggedIn.next(false);
+          return throwError(
+            () =>
+              new Error(
+                error.error?.error || 'Registration failed. Please try again.'
+              )
+          );
+        })
+      );
+  }
+
+  login(email: string, password: string): Observable<LoginResponse> {
+    if (!email || !password) {
+      return throwError(() => new Error('Email and password are required.'));
+    }
+
+    return this.http
+      .post<LoginResponse>('/api/auth/login', { email, password })
+      .pipe(
+        tap((response) => {
+          if (response && response.userId && response.username) {
+            localStorage.setItem(this.userKey, response.userId);
+            localStorage.setItem(this.userNameKey, response.username);
+            this.loggedIn.next(true);
+            console.log('Login successful, userId:', response.userId);
+          } else {
+            throw new Error('Login failed: Invalid response from server.');
+          }
+        }),
+        catchError((error) => {
+          console.error('Login error:', error);
+          this.loggedIn.next(false);
+          return throwError(
+            () =>
+              new Error(error.error?.error || 'Login failed. Please try again.')
+          );
+        })
+      );
   }
 
   logout(): void {
@@ -75,18 +126,22 @@ export class AuthService {
       console.error('Brak userId');
       return;
     }
+    this.finalizeLogout();
 
-    this.http.delete(`${this.logoutUrl}/${userId}`).subscribe({
-      next: () => this.finalizeLogout(),
-      error: (err) => {
-        console.error('Błąd przy usuwaniu gracza z sesji:', err);
-        this.finalizeLogout(); // nawet jeśli błąd, wyloguj lokalnie
-      },
-    });
+    // this.http.delete(`${this.logoutUrl}/${userId}`).subscribe({
+    //   next: () => this.finalizeLogout(),
+    //   error: (err) => {
+    //     console.error('Błąd przy usuwaniu gracza z sesji:', err);
+    //     this.finalizeLogout(); // nawet jeśli błąd, wyloguj lokalnie
+    //   },
+    // });
   }
 
   private finalizeLogout(): void {
     localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.userNameKey);
+    this.clearRedirectUrl();
+    console.log('User logged out successfully.');
     this.loggedIn.next(false);
     this.router.navigate(['/login']);
   }

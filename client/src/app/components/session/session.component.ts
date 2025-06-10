@@ -9,6 +9,8 @@ import { catchError } from 'rxjs/operators';
 import { Card } from '../../models/card.model'; // Adjust path
 import { CardService } from '../../services/card.service'; // Adjust path
 import { GameSession, Player, Task } from '../../models/session-state.model'; // Adjust path
+import { EstimationHistory } from '../../models/session-history.model'; // Adjust path
+import { Router } from '@angular/router'; // If you need to navigate
 
 @Component({
   selector: 'app-session',
@@ -35,11 +37,15 @@ export class SessionComponent {
   showLink = false;
   currentGameLink: string = '';
 
+  isSavingEstimation: boolean = false;
+  estimationSaved: boolean = false;
+
   constructor(
     private gameSocketService: GameSocketService,
     private sessionService: SessionService,
     private authService: AuthService,
-    private cardService: CardService // Adjust path
+    private cardService: CardService,
+    private router: Router
   ) {
     // Get socket connection status from GameSocketService
     this.socketReady$ = this.gameSocketService.getSessionConnected();
@@ -64,6 +70,11 @@ export class SessionComponent {
       }
       this.checkVotesAndEndSession();
     });
+
+    this.gameSocketService.onSessionEnded().subscribe(() => {
+      this.sessionEnded = true;
+      this.router.navigate(['/lobby']);
+    });
   }
 
   ngOnInit(): void {
@@ -86,6 +97,7 @@ export class SessionComponent {
   }
 
   joinGameSession(sessionId: string, userId: string, username: string): void {
+    this.gameSocketService.connectToSocket();
     // Subscribe to socket connection status
     this.socketReady$.subscribe((isReady) => {
       if (isReady) {
@@ -202,6 +214,27 @@ export class SessionComponent {
   }
 
   logout(): void {
+    if (!this.sessionState || !this.playerId) {
+      console.error(
+        'Nie można usunąć gracza z sesji, brak danych sesji lub gracza.'
+      );
+      return;
+    }
+
+    // Jeśli użytkownik jest creatorem, zakończ sesję przed wylogowaniem
+    if (this.isCreator) {
+      console.log('User is creator, ending session before logout.');
+      this.gameSocketService.endSession(this.sessionState.sessionId);
+    }
+
+    // Remove player from session and then log out
+    console.log('Removing player from session:', this.playerId);
+    console.log('Session ID:', this.sessionState.sessionId);
+    console.log('Logging out user:', this.playerId);
+    this.gameSocketService.removePlayerFromSession(
+      this.sessionState?.sessionId || '',
+      this.playerId || ''
+    );
     this.authService.logout();
   }
 
@@ -224,5 +257,123 @@ export class SessionComponent {
         console.error('Błąd eksportu CSV:', err.message);
       },
     });
+  }
+
+  saveEstimation(): void {
+    if (!this.sessionState || !this.sessionState.tasks) {
+      console.error('No tasks to save.');
+      return;
+    }
+
+    const estimationHistory: EstimationHistory = {
+      userId: this.authService.getUserId() || '',
+      sessionId: this.sessionState.sessionId,
+      storyTitle: this.getCurrentTask()?.name || '',
+      selectedCardValue:
+        this.selectedCardValue !== null ? String(this.selectedCardValue) : '',
+      date: new Date().toISOString(),
+      teammates: this.sessionState.players.map((player) => player.username),
+      allVotes: this.sessionState.players.map((player) => ({
+        username: player.username,
+        card:
+          player.selectedCardValue !== null
+            ? String(player.selectedCardValue)
+            : '',
+      })),
+    };
+
+    this.sessionService.saveEstimationHistory(estimationHistory).subscribe({
+      next: (response) => {
+        console.log('Estimation saved successfully:', response);
+      },
+      error: (err) => {
+        console.error('Błąd zapisu estymacji:', err.message);
+      },
+    });
+  }
+
+  confirmEndSession(): void {
+    if (
+      confirm(
+        'Czy na pewno chcesz zakończyć tę sesję? Tej operacji nie można cofnąć.'
+      )
+    ) {
+      this.endSession();
+    }
+  }
+
+  endSession(): void {
+    if (!this.sessionState || !this.playerId) {
+      console.error('Nie można zakończyć sesji, brak danych sesji lub gracza.');
+      return;
+    }
+    // End the session
+    this.gameSocketService.endSession(this.sessionState.sessionId);
+    this.sessionEnded = true;
+    this.router.navigate(['/lobby']);
+  }
+
+  saveCurrentTaskEstimation(): void {
+    if (!this.sessionState || !this.getCurrentTask()) {
+      console.error('Brak aktualnego zadania do zapisania.');
+      return;
+    }
+
+    const currentTask = this.getCurrentTask();
+    if (currentTask?.status !== 'estimated') {
+      console.error('Zadanie nie jest w stanie "estimated".');
+      return;
+    }
+
+    this.isSavingEstimation = true;
+    this.estimationSaved = false;
+
+    // Znajdź głos aktualnego użytkownika
+    const currentPlayer = this.sessionState.players.find(
+      (player) => player.id === this.playerId
+    );
+    const userVote = currentPlayer?.selectedCardValue;
+
+    const estimationHistory: EstimationHistory = {
+      userId: this.authService.getUserId() || '',
+      sessionId: this.sessionState.sessionId,
+      storyTitle: currentTask.name,
+      selectedCardValue:
+        userVote !== null && userVote !== undefined ? String(userVote) : '',
+      date: new Date().toISOString(),
+      teammates: this.sessionState.players
+        .filter((player) => player.id !== this.playerId)
+        .map((player) => player.username),
+      allVotes: this.sessionState.players.map((player) => ({
+        username: player.username,
+        card:
+          player.selectedCardValue !== null &&
+          player.selectedCardValue !== undefined
+            ? String(player.selectedCardValue)
+            : 'brak głosu',
+      })),
+    };
+
+    this.sessionService.saveEstimationHistory(estimationHistory).subscribe({
+      next: (response) => {
+        console.log('Estimation saved successfully:', response);
+        this.isSavingEstimation = false;
+        this.estimationSaved = true;
+
+        // Ukryj komunikat o sukcesie po 3 sekundach
+        setTimeout(() => {
+          this.estimationSaved = false;
+        }, 3000);
+      },
+      error: (err) => {
+        console.error('Błąd zapisu estymacji:', err.message);
+        this.isSavingEstimation = false;
+        // Możesz dodać obsługę błędu w UI
+      },
+    });
+  }
+
+  backToLobby(): void {
+    this.router.navigate(['/lobby']);
   }
 }
