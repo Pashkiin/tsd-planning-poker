@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { SessionService } from '../../services/session.service';
 import { CommonModule } from '@angular/common';
 import { SessionSummary } from '../../models/session-summary.model';
@@ -13,6 +13,9 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { filter } from 'rxjs/operators';
+import { interval, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-lobby',
@@ -27,6 +30,7 @@ export class LobbyComponent implements OnInit {
   userId: string | null = null;
 
   sessionForm!: FormGroup;
+  private sessionPollingSubscription?: Subscription;
 
   constructor(
     private sessionService: SessionService,
@@ -38,24 +42,33 @@ export class LobbyComponent implements OnInit {
   ngOnInit(): void {
     this.userId = this.authService.getUserId();
 
-    if (this.userId) {
-      this.sessionService.getAllSessions().subscribe({
-        next: (sessions: SessionSummary[]) => {
-          this.sessions = sessions;
-        },
-        error: (err) => {
-          console.error('Błąd podczas pobierania sesji:', err);
-        },
-      });
-    } else {
+    if (!this.userId) {
       console.error('Brak identyfikatora użytkownika!');
       this.router.navigate(['/login']);
+      return;
     }
+
+    this.loadSessions();
 
     this.sessionForm = this.fb.group({
       sessionName: ['', Validators.required],
       taskName: ['', Validators.required],
       taskDescription: ['', Validators.required],
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sessionPollingSubscription?.unsubscribe();
+  }
+
+  loadSessions(): void {
+    this.sessionService.getAllSessions().subscribe({
+      next: (sessions: SessionSummary[]) => {
+        this.sessions = sessions;
+      },
+      error: (err) => {
+        console.error('Błąd podczas pobierania sesji:', err);
+      },
     });
   }
 
@@ -127,5 +140,8 @@ export class LobbyComponent implements OnInit {
       .catch((err) => {
         console.error('Nie udało się skopiować linku', err);
       });
+  }
+  logout(): void {
+    this.authService.logout();
   }
 }

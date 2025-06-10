@@ -49,6 +49,16 @@ export class GameSocketService {
     });
   }
 
+  connectToSocket(): void {
+    if (!this.socket.connected) {
+      this.socket.connect();
+    }
+  }
+  disconnectFromSocket(): void {
+    if (this.socket.connected) {
+      this.socket.disconnect();
+    }
+  }
   // Emit joinSession event to the server
   joinSession(sessionId: string, userId: string, username: string): void {
     this.socket.emit('joinSession', {
@@ -95,5 +105,12 @@ export class GameSocketService {
       taskName,
       taskDescription,
     });
+  }
+  removePlayerFromSession(sessionId: string, playerId: string): void {
+    this.socket.emit('removePlayerFromSession', {
+      sessionId,
+      playerId,
+    });
+    this.socket.disconnect();
   }
 }

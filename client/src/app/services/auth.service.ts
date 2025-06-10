@@ -126,18 +126,22 @@ export class AuthService {
       console.error('Brak userId');
       return;
     }
+    this.finalizeLogout();
 
-    this.http.delete(`${this.logoutUrl}/${userId}`).subscribe({
-      next: () => this.finalizeLogout(),
-      error: (err) => {
-        console.error('Błąd przy usuwaniu gracza z sesji:', err);
-        this.finalizeLogout(); // nawet jeśli błąd, wyloguj lokalnie
-      },
-    });
+    // this.http.delete(`${this.logoutUrl}/${userId}`).subscribe({
+    //   next: () => this.finalizeLogout(),
+    //   error: (err) => {
+    //     console.error('Błąd przy usuwaniu gracza z sesji:', err);
+    //     this.finalizeLogout(); // nawet jeśli błąd, wyloguj lokalnie
+    //   },
+    // });
   }
 
   private finalizeLogout(): void {
     localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.userNameKey);
+    this.clearRedirectUrl();
+    console.log('User logged out successfully.');
     this.loggedIn.next(false);
     this.router.navigate(['/login']);
   }

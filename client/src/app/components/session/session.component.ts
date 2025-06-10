@@ -86,6 +86,7 @@ export class SessionComponent {
   }
 
   joinGameSession(sessionId: string, userId: string, username: string): void {
+    this.gameSocketService.connectToSocket();
     // Subscribe to socket connection status
     this.socketReady$.subscribe((isReady) => {
       if (isReady) {
@@ -202,6 +203,20 @@ export class SessionComponent {
   }
 
   logout(): void {
+    if (!this.sessionState || !this.playerId) {
+      console.error(
+        'Nie można usunąć gracza z sesji, brak danych sesji lub gracza.'
+      );
+      return;
+    }
+    // Remove player from session and then log out
+    console.log('Removing player from session:', this.playerId);
+    console.log('Session ID:', this.sessionState.sessionId);
+    console.log('Logging out user:', this.playerId);
+    this.gameSocketService.removePlayerFromSession(
+      this.sessionState?.sessionId || '',
+      this.playerId || ''
+    );
     this.authService.logout();
   }
 
