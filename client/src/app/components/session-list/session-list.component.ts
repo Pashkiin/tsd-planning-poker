@@ -35,7 +35,7 @@ export class SessionListComponent implements OnInit {
         'Nie jesteś zalogowany. Nie można pobrać historii estymacji.';
       return;
     }
-    this.sessionService.getSessionHistory(userId).subscribe({
+    this.sessionService.getEstimationHistory(userId).subscribe({
       next: (history) => {
         this.estimationHistory = history;
       },
@@ -68,5 +68,9 @@ export class SessionListComponent implements OnInit {
   }
   navigateToSessionList() {
     this.router.navigate(['/lobby']);
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }

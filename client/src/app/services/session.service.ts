@@ -142,7 +142,7 @@ export class SessionService {
       );
   }
 
-  getSessionHistory(userId: string): Observable<EstimationHistory[]> {
+  getEstimationHistory(userId: string): Observable<EstimationHistory[]> {
     if (!userId) {
       return throwError(() => new Error('User ID is required.'));
     }
@@ -151,19 +151,23 @@ export class SessionService {
       .get<EstimationHistory[]>(`${this.apiHistoryUrl}/${userId}`)
       .pipe(
         catchError((error) => {
-          console.error('Error fetching session history:', error);
+          console.error('Error fetching estimation history:', error);
           return throwError(
-            () => new Error('Failed to fetch session history.')
+            () => new Error('Failed to fetch estimation history.')
           );
         })
       );
   }
 
-  addSessionHistory(history: EstimationHistory): Observable<EstimationHistory> {
+  saveEstimationHistory(
+    history: EstimationHistory
+  ): Observable<EstimationHistory> {
     return this.http.post<EstimationHistory>(this.apiHistoryUrl, history).pipe(
       catchError((error) => {
-        console.error('Error adding session history:', error);
-        return throwError(() => new Error('Failed to add session history.'));
+        console.error('Error saving estimation history:', error);
+        return throwError(
+          () => new Error('Failed to save estimation history.')
+        );
       })
     );
   }
