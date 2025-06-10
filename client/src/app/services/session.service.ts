@@ -142,6 +142,22 @@ export class SessionService {
       );
   }
 
+  importTasks(formData: FormData) {
+    return this.http
+      .post<{ message: string; importedTasks: any[] }>(
+        '/api/tasks/import-tasks',
+        formData
+      )
+      .pipe(
+        catchError((error) => {
+          console.error('Import tasks error:', error);
+          return throwError(
+            () => new Error(error?.error?.error || 'Failed to import tasks.')
+          );
+        })
+      );
+  }
+
   getEstimationHistory(userId: string): Observable<EstimationHistory[]> {
     if (!userId) {
       return throwError(() => new Error('User ID is required.'));

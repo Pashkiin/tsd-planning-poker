@@ -262,6 +262,37 @@ export class SessionComponent {
     });
   }
 
+  selectedFile: File | null = null;
+
+  onFileSelected(event: any): void {
+    this.selectedFile = event.target.files[0] || null;
+  }
+
+  importTasks(): void {
+    if (!this.selectedFile) return;
+    const formData = new FormData();
+    formData.append('csvFile', this.selectedFile);
+
+    this.sessionService.importTasks(formData).subscribe({
+      next: (res: any) => {
+        alert('Tasks imported successfully!');
+        // Odczytaj taski z res.tasks (tablica)
+        if (res?.tasks && Array.isArray(res.tasks)) {
+          for (const task of res.tasks) {
+            this.gameSocketService.addNewTask(
+              task.name,
+              task.description || ''
+            );
+          }
+        }
+        this.selectedFile = null;
+      },
+      error: (err) => {
+        alert('Import failed: ' + (err.error?.error || err.message));
+      },
+    });
+  }
+
   saveEstimation(): void {
     if (!this.sessionState || !this.sessionState.tasks) {
       console.error('No tasks to save.');

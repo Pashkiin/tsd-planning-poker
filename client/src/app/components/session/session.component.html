@@ -177,5 +177,7 @@
                 </div>
             </div>
         </div>
+        <input type="file" (change)="onFileSelected($event)" />
+        <button class="btn btn-primary" [disabled]="!selectedFile" (click)="importTasks()">Import tasks</button>
     </div>
 </div>
