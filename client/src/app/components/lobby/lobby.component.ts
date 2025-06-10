@@ -144,4 +144,8 @@ export class LobbyComponent implements OnInit {
   logout(): void {
     this.authService.logout();
   }
+
+  navigateToSessionList(): void {
+    this.router.navigate(['/sessionList']);
+  }
 }

@@ -1,0 +1,57 @@
+<div class="estimation-history-container">
+    <button class="btn btn-secondary mb-3" (click)="navigateToSessionList()">
+        <i class="bi bi-arrow-left"></i> Back to lobby
+    </button>
+    <h2>Estimation History</h2>
+
+    <div *ngIf="loading" class="loading">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && estimationHistory.length === 0" class="alert alert-info">
+        No estimation history available.
+    </div>
+
+    <div *ngIf="!loading && !error && estimationHistory.length > 0" class="history-list">
+        <div *ngFor="let item of estimationHistory" class="history-item card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ item.storyTitle }}</h5>
+                <small class="text-muted">{{ formatDate(item.date) }}</small>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Sessions:</strong> {{ item.sessionId }}</p>
+                        <p><strong>Your Card:</strong>
+                            <span class="badge bg-primary">{{ item.selectedCardValue }}</span>
+                        </p>
+                        <p><strong>Participants:</strong> {{ item.teammates.join(', ') }}</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <p><strong>All Votes:</strong></p>
+                        <div class="votes-container">
+                            <span *ngFor="let vote of item.allVotes" class="badge me-1 mb-1"
+                                [class.bg-success]="vote.card === item.selectedCardValue"
+                                [class.bg-secondary]="vote.card !== item.selectedCardValue">
+                                {{ vote.username }}: {{ vote.card }}
+                            </span>
+                        </div>
+                        <p class="mt-2"><strong>Summary:</strong> {{ getVotesSummary(item.allVotes) }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-outline-primary" (click)="loadEstimationHistory()">
+        Refresh History
+    </button>
+</div>

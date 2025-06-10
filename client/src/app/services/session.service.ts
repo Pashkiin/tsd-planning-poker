@@ -6,12 +6,14 @@ import { Router } from '@angular/router';
 import { SessionCreateResponse } from '../models/session-create-response.model';
 import { SessionCreate } from '../models/session-create.model';
 import { SessionSummary } from '../models/session-summary.model';
+import { EstimationHistory } from '../models/session-history.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SessionService {
   private apiUrl = '/api/sessions';
+  private apiHistoryUrl = '/api/history';
   private sessionKey = 'game_session_id';
 
   private SessionCreate: SessionCreate = {
@@ -138,5 +140,31 @@ export class SessionService {
           return throwError(() => new Error('Failed to export tasks to CSV.'));
         })
       );
+  }
+
+  getSessionHistory(userId: string): Observable<EstimationHistory[]> {
+    if (!userId) {
+      return throwError(() => new Error('User ID is required.'));
+    }
+
+    return this.http
+      .get<EstimationHistory[]>(`${this.apiHistoryUrl}/${userId}`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error fetching session history:', error);
+          return throwError(
+            () => new Error('Failed to fetch session history.')
+          );
+        })
+      );
+  }
+
+  addSessionHistory(history: EstimationHistory): Observable<EstimationHistory> {
+    return this.http.post<EstimationHistory>(this.apiHistoryUrl, history).pipe(
+      catchError((error) => {
+        console.error('Error adding session history:', error);
+        return throwError(() => new Error('Failed to add session history.'));
+      })
+    );
   }
 }
