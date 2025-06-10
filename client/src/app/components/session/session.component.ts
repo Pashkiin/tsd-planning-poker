@@ -10,6 +10,7 @@ import { Card } from '../../models/card.model'; // Adjust path
 import { CardService } from '../../services/card.service'; // Adjust path
 import { GameSession, Player, Task } from '../../models/session-state.model'; // Adjust path
 import { EstimationHistory } from '../../models/session-history.model'; // Adjust path
+import { Router } from '@angular/router'; // If you need to navigate
 
 @Component({
   selector: 'app-session',
@@ -43,7 +44,8 @@ export class SessionComponent {
     private gameSocketService: GameSocketService,
     private sessionService: SessionService,
     private authService: AuthService,
-    private cardService: CardService // Adjust path
+    private cardService: CardService,
+    private router: Router
   ) {
     // Get socket connection status from GameSocketService
     this.socketReady$ = this.gameSocketService.getSessionConnected();
@@ -67,6 +69,11 @@ export class SessionComponent {
         console.log('Is Creator:', this.isCreator);
       }
       this.checkVotesAndEndSession();
+    });
+
+    this.gameSocketService.onSessionEnded().subscribe(() => {
+      this.sessionEnded = true;
+      this.router.navigate(['/lobby']);
     });
   }
 
@@ -286,6 +293,7 @@ export class SessionComponent {
     // End the session
     this.gameSocketService.endSession(this.sessionState.sessionId);
     this.sessionEnded = true;
+    this.router.navigate(['/lobby']);
   }
 
   saveCurrentTaskEstimation(): void {

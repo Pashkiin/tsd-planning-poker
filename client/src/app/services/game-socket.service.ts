@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { GameSession, Player } from '../models/session-state.model'; // Adjust path
 
 @Injectable({
@@ -46,6 +46,12 @@ export class GameSocketService {
 
     this.socket.on('sessionUpdate', (sessionState: GameSession) => {
       this.sessionStateSubject.next(sessionState); // Update sessionState
+    });
+
+    this.socket.on('sessionEnd', (data: { message: string }) => {
+      console.log('Session ended:', data.message);
+      this.sessionStateSubject.next(null); // Clear session state on end
+      this.playerIdSubject.next(null); // Clear playerId on end
     });
   }
 
@@ -115,9 +121,14 @@ export class GameSocketService {
   }
 
   endSession(sessionId: string): void {
-    this.socket.emit('endSession', {
-      sessionId,
+    this.socket.emit('sessionEnd', sessionId);
+  }
+
+  onSessionEnded(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('sessionEnded', (data: any) => {
+        observer.next(data);
+      });
     });
-    this.socket.disconnect();
   }
 }

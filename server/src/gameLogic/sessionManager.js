@@ -153,7 +153,12 @@ class SessionManager {
   endSession(sessionId) {
     const session = this.getSession(sessionId);
     if (session) {
-      session.endSession();
+      if (Array.isArray(session.players)) {
+        const playerIds = session.players.map(p => p.id);
+        playerIds.forEach(playerId => {
+          session.removePlayer(playerId);
+        });
+      }
       this.removeSession(sessionId);
       console.log(`Session ${sessionId} ended and removed.`);
       return true;
@@ -165,5 +170,4 @@ class SessionManager {
 
 
 
-// Make SessionManager a singleton
 module.exports = new SessionManager();
