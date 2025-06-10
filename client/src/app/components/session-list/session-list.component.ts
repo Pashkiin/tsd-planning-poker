@@ -17,6 +17,7 @@ export class SessionListComponent implements OnInit {
   estimationHistory: EstimationHistory[] = [];
   loading = false;
   error: string | null = null;
+  deletingItemId: string | null = null;
   constructor(
     private http: HttpClient,
     private authService: AuthService,
@@ -72,5 +73,39 @@ export class SessionListComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  confirmDelete(item: EstimationHistory): void {
+    const confirmed = confirm(
+      `Czy na pewno chcesz usunąć estymację dla "${item.storyTitle}"?\n\nTa akcja jest nieodwracalna.`
+    );
+
+    if (confirmed && item._id) {
+      this.deleteEstimation(item._id);
+    }
+  }
+
+  deleteEstimation(itemId: string): void {
+    this.deletingItemId = itemId;
+
+    this.sessionService.deleteEstimationHistory(itemId).subscribe({
+      next: () => {
+        // Usuń element z lokalnej tablicy
+        this.estimationHistory = this.estimationHistory.filter(
+          (item) => item._id !== itemId
+        );
+        this.deletingItemId = null;
+        console.log('Estymacja została usunięta');
+      },
+      error: (err) => {
+        console.error('Błąd podczas usuwania estymacji:', err);
+        this.deletingItemId = null;
+        alert('Nie udało się usunąć estymacji. Spróbuj ponownie.');
+      },
+    });
+  }
+
+  isDeleting(itemId: string): boolean {
+    return this.deletingItemId === itemId;
   }
 }

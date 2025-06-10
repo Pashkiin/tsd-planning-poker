@@ -163,7 +163,7 @@ export class SessionService {
     history: EstimationHistory
   ): Observable<EstimationHistory> {
     return this.http
-      .post<EstimationHistory>(`${this.apiHistoryUrl}/add`, history)
+      .post<EstimationHistory>(`${this.apiHistoryUrl}`, history)
       .pipe(
         catchError((error) => {
           console.error('Error saving estimation history:', error);
@@ -172,5 +172,16 @@ export class SessionService {
           );
         })
       );
+  }
+
+  deleteEstimationHistory(historyId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiHistoryUrl}/${historyId}`).pipe(
+      catchError((error) => {
+        console.error('Error deleting estimation history:', error);
+        return throwError(
+          () => new Error('Failed to delete estimation history.')
+        );
+      })
+    );
   }
 }

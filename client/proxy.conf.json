@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://maluch3.mikr.us:20352/",
+    "target": "http://localhost:20352/",
     "secure": false,
     "logLevel": "debug"
   }

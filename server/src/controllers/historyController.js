@@ -94,6 +94,30 @@ const saveEstimationHistory = async (req, res) => {
     }
 };
 
+
+const deleteEstimationHistory = async (req, res) => {
+    try {
+        const { historyId } = req.params;
+
+        if (!historyId) {
+            return res.status(400).json({ error: "History ID is required." });
+        }
+
+        const result = await EstimationHistory.findByIdAndDelete(historyId);
+        if (!result) {
+            return res.status(404).json({ error: "History entry not found." });
+        }
+
+        res.status(200).json({ message: "Estimation history deleted successfully." });
+    } catch (err) {
+        console.error("❌ Error deleting estimation history:", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+};
+
+
 module.exports = {
     getUserHistory,
-    saveEstimationHistory};
+    saveEstimationHistory,
+    deleteEstimationHistory
+};

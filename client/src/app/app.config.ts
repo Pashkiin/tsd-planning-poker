@@ -11,7 +11,7 @@ import { importProvidersFrom } from '@angular/core';
 import { routes } from './app.routes';
 
 const socketConfig: SocketIoConfig = {
-  url: 'http://maluch3.mikr.us:20352/',
+  url: 'http://localhost:20352/',
   options: {
     transports: ['websocket'],
   },

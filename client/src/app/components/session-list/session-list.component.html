@@ -1,15 +1,9 @@
 <div class="estimation-history-container">
-    <button class="btn btn-danger px-4 py-2 ms-auto" (click)="logout()">
-        🚪 Log out
-    </button>
-    <button class="btn btn-secondary mb-3" (click)="navigateToSessionList()">
-        <i class="bi bi-arrow-left"></i> Back to lobby
-    </button>
-    <h2>Estimation History</h2>
+    <h2>Historia Estymacji</h2>
 
     <div *ngIf="loading" class="loading">
         <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">Ładowanie...</span>
         </div>
     </div>
 
@@ -18,29 +12,36 @@
     </div>
 
     <div *ngIf="!loading && !error && estimationHistory.length === 0" class="alert alert-info">
-        No estimation history available.
+        Brak historii estymacji.
     </div>
 
     <div *ngIf="!loading && !error && estimationHistory.length > 0" class="history-list">
         <div *ngFor="let item of estimationHistory" class="history-item card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">{{ item.storyTitle }}</h5>
-                <small class="text-muted">{{ formatDate(item.date) }}</small>
+                <div class="d-flex align-items-center gap-2">
+                    <small class="text-muted">{{ formatDate(item.date) }}</small>
+                    <button class="btn btn-outline-danger btn-sm" (click)="confirmDelete(item)"
+                        [disabled]="isDeleting(item._id || '')" title="Usuń estymację">
+                        <span *ngIf="isDeleting(item._id || '')" class="spinner-border spinner-border-sm me-1"></span>
+                        <i class="fas fa-trash" *ngIf="!isDeleting(item._id || '')"></i>
+                        {{ isDeleting(item._id || '') ? 'Usuwam...' : 'Delete' }}
+                    </button>
+                </div>
             </div>
 
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Session:</strong> {{ item.sessionId }}</p>
-                        <p><strong>Story Title:</strong> {{ item.storyTitle }}</p>
-                        <p><strong>Your Card:</strong>
+                        <p><strong>Sesja:</strong> {{ item.sessionId }}</p>
+                        <p><strong>Twoja karta:</strong>
                             <span class="badge bg-primary">{{ item.selectedCardValue }}</span>
                         </p>
-                        <p><strong>Participants:</strong> {{ item.teammates.join(', ') }}</p>
+                        <p><strong>Uczestnicy:</strong> {{ item.teammates.join(', ') }}</p>
                     </div>
 
                     <div class="col-md-6">
-                        <p><strong>All Votes:</strong></p>
+                        <p><strong>Wszystkie głosy:</strong></p>
                         <div class="votes-container">
                             <span *ngFor="let vote of item.allVotes" class="badge me-1 mb-1"
                                 [class.bg-success]="vote.card === item.selectedCardValue"
@@ -48,14 +49,19 @@
                                 {{ vote.username }}: {{ vote.card }}
                             </span>
                         </div>
-                        <p class="mt-2"><strong>Summary:</strong> {{ getVotesSummary(item.allVotes) }}</p>
+                        <p class="mt-2"><strong>Podsumowanie:</strong> {{ getVotesSummary(item.allVotes) }}</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <button class="btn btn-outline-primary" (click)="loadEstimationHistory()">
-        Refresh History
-    </button>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary" (click)="loadEstimationHistory()">
+            Odśwież historię
+        </button>
+        <button class="btn btn-secondary" (click)="navigateToSessionList()">
+            Powrót do lobby
+        </button>
+    </div>
 </div>
