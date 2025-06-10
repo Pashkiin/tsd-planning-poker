@@ -1,102 +1,59 @@
-# 🃏 TSD Planning Poker
+# Client
 
-A **Planning Poker** application built as part of the **Technologies of Software Development** course.  
-This full-stack project uses **Angular** on the frontend and **Node.js + Express** on the backend.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.6.
 
-# 📁 Project Structure
+## Development server
 
-```
-TSD-PLANNING-POKER/
-├── client/                    # Angular frontend application
-│   ├── .angular/              # Angular CLI cache
-│   ├── node_modules/          # Frontend dependencies
-│   ├── public/                # Static assets (optional)
-│   └── src/                   # Source code for frontend
-│       ├── app/               # Core app module
-│       │   ├── components/    # UI components
-│       │   │   ├── game/      # Game interface components
-│       │   │   └── login/     # Login/register components
-│       │   ├── guards/        # Angular route guards
-│       │   ├── models/        # TypeScript interfaces & types
-│       │   └── services/      # Reusable services
-│       └── assets/ (optional) # Static resources like images
-├── server/                    # Node.js + Express backend
-│   ├── node_modules/          # Backend dependencies
-│   ├── src/                   # Source code for backend
-│   │   ├── config/            # Config files (e.g., DB, env)
-│   │   ├── controllers/       # Request handler functions
-│   │   ├── gameLogic/         # Core game logic modules
-│   │   ├── middlewares/       # Custom Express middlewares
-│   │   ├── models/            # Mongoose models
-│   │   ├── routes/            # API route definitions
-│   │   ├── services/          # Business logic layer
-│   │   └── utils/             # Utility/helper functions
-│   |
-│   └── tests/                 # Backend tests
-└── tests/                     # End-to-end tests (e.g., Selenium)
-```
-
-## 🌐 Technologies Used
-
-| Layer       | Stack                        |
-|------------|------------------------------|
-| Frontend   | Angular, TypeScript, Tailwind, Jest |
-| Backend    | Node.js, Express, MongoDB (via Mongoose) |
-| Testing    | Jest (unit tests), Selenium (E2E) |
-
----
-
-## 🚀 Getting Started
-
-### 🔧 Prerequisites
-
-- Node.js (v18+ recommended)
-- Angular CLI (`npm install -g @angular/cli`)
-- MongoDB Atlas
-
----
-
-## 🛠️ Local Development Setup
-
-### 1. Clone the Repository
+To start a local development server, run:
 
 ```bash
-git clone https://github.com/Pashkiin/tsd-planning-poker.git
-cd planning-poker-app
+ng serve
 ```
 
----
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-### 2. Backend Setup (Node.js + Express)
+## Code scaffolding
+
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
 ```bash
-cd server
-npm install
-cp .env                        # Create environment config
-npm run dev                    # Starts backend at http://localhost:3000
+ng generate component component-name
 ```
 
-✅ The backend will listen on `http://localhost:3000` by default.
-
----
-
-### 3. Frontend Setup (Angular)
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
 ```bash
-cd ../client
-npm install
-ng serve                     # Starts frontend at http://localhost:4200
+ng generate --help
 ```
 
-✅ Open [http://localhost:4200](http://localhost:4200) to use the app.
+## Building
 
----
+To build the project run:
 
-## ⚙️ Environment Variables
-
-In `server/.env`:
-
-```env
-PORT=3000
-MONGODB_URI=your connection string from mongoDB Atlas
+```bash
+ng build
 ```
+
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running unit tests
+
+To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
