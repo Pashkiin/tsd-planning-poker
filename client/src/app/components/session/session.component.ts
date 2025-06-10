@@ -220,6 +220,13 @@ export class SessionComponent {
       );
       return;
     }
+
+    // Jeśli użytkownik jest creatorem, zakończ sesję przed wylogowaniem
+    if (this.isCreator) {
+      console.log('User is creator, ending session before logout.');
+      this.gameSocketService.endSession(this.sessionState.sessionId);
+    }
+
     // Remove player from session and then log out
     console.log('Removing player from session:', this.playerId);
     console.log('Session ID:', this.sessionState.sessionId);
@@ -283,6 +290,16 @@ export class SessionComponent {
         console.error('Błąd zapisu estymacji:', err.message);
       },
     });
+  }
+
+  confirmEndSession(): void {
+    if (
+      confirm(
+        'Czy na pewno chcesz zakończyć tę sesję? Tej operacji nie można cofnąć.'
+      )
+    ) {
+      this.endSession();
+    }
   }
 
   endSession(): void {
@@ -354,5 +371,9 @@ export class SessionComponent {
         // Możesz dodać obsługę błędu w UI
       },
     });
+  }
+
+  backToLobby(): void {
+    this.router.navigate(['/lobby']);
   }
 }
