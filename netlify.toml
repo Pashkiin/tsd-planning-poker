@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/api/*"
+  to = "http://maluch3.mikr.us:20352/"
+  status = 200
+  force = true # Optional, ensures the rewrite happens even if a file matches the path
