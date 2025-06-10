@@ -3,40 +3,61 @@
     <div class="col-md-6 col-lg-4">
       <div class="card shadow">
         <div class="card-body">
-          <h3 class="card-title text-center mb-4">Enter Planning Poker</h3>
+          <h3 class="card-title text-center mb-4">
+            {{ isRegisterMode ? 'Register for Planning Poker' : 'Enter Planning Poker' }}
+          </h3>
+
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <!-- Username -->
             <div class="mb-3">
               <label for="username" class="form-label">Username</label>
-              <input
-                type="text"
-                id="username"
-                class="form-control"
-                formControlName="username"
-                placeholder="Enter your username"
-                [class.is-invalid]="
-                  loginForm.get('username')?.invalid &&
-                  loginForm.get('username')?.touched
-                "
-              />
-              <div
-                *ngIf="
-                  loginForm.get('username')?.invalid &&
-                  loginForm.get('username')?.touched
-                "
-                class="invalid-feedback"
-              >
+              <input type="text" id="username" class="form-control" formControlName="username"
+                placeholder="Enter your username" [class.is-invalid]="
+                  loginForm.get('username')?.invalid && loginForm.get('username')?.touched
+                " />
+              <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+                class="invalid-feedback">
                 Username is required.
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" id="password" class="form-control" formControlName="password"
+                placeholder="Enter your password" [class.is-invalid]="
+                  loginForm.get('password')?.invalid && loginForm.get('password')?.touched
+                " />
+              <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                class="invalid-feedback">
+                Password is required.
+              </div>
+            </div>
+
+            <!-- Privacy Policy Checkbox (only in register mode) -->
+            <div class="mb-3 form-check" *ngIf="isRegisterMode">
+              <input type="checkbox" id="acceptedPolicy" class="form-check-input" formControlName="acceptedPolicy"
+                [class.is-invalid]="
+      loginForm.get('acceptedPolicy')?.invalid && loginForm.get('acceptedPolicy')?.touched
+    " />
+              <label class="form-check-label" for="acceptedPolicy">
+                I accept the <a href="#" target="_blank">Privacy Policy</a>.
+              </label>
+              <div *ngIf="loginForm.get('acceptedPolicy')?.invalid && loginForm.get('acceptedPolicy')?.touched"
+                class="invalid-feedback d-block">
+                You must accept the privacy policy.
               </div>
             </div>
 
             <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
 
-            <button
-              type="submit"
-              class="btn btn-primary w-100 mt-3"
-              [disabled]="loginForm.invalid || isLoading"
-            >
-              {{ isLoading ? "Logging in..." : "Join Game" }}
+            <button type="submit" class="btn btn-primary w-100 mt-3" [disabled]="loginForm.invalid || isLoading">
+              {{ isLoading ? (isRegisterMode ? 'Registering...' : 'Logging in...') : (isRegisterMode ? 'Register' :
+              'Join Game') }}
+            </button>
+
+            <button type="button" class="btn btn-link w-100 mt-2" (click)="toggleMode()">
+              {{ isRegisterMode ? 'Already have an account? Login' : 'New here? Register' }}
             </button>
           </form>
         </div>
