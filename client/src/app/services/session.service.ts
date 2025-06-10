@@ -162,13 +162,15 @@ export class SessionService {
   saveEstimationHistory(
     history: EstimationHistory
   ): Observable<EstimationHistory> {
-    return this.http.post<EstimationHistory>(this.apiHistoryUrl, history).pipe(
-      catchError((error) => {
-        console.error('Error saving estimation history:', error);
-        return throwError(
-          () => new Error('Failed to save estimation history.')
-        );
-      })
-    );
+    return this.http
+      .post<EstimationHistory>(`${this.apiHistoryUrl}/add`, history)
+      .pipe(
+        catchError((error) => {
+          console.error('Error saving estimation history:', error);
+          return throwError(
+            () => new Error('Failed to save estimation history.')
+          );
+        })
+      );
   }
 }

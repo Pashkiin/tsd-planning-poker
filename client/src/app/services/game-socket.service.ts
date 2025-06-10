@@ -113,4 +113,11 @@ export class GameSocketService {
     });
     this.socket.disconnect();
   }
+
+  endSession(sessionId: string): void {
+    this.socket.emit('endSession', {
+      sessionId,
+    });
+    this.socket.disconnect();
+  }
 }

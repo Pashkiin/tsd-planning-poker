@@ -9,6 +9,7 @@ import { catchError } from 'rxjs/operators';
 import { Card } from '../../models/card.model'; // Adjust path
 import { CardService } from '../../services/card.service'; // Adjust path
 import { GameSession, Player, Task } from '../../models/session-state.model'; // Adjust path
+import { EstimationHistory } from '../../models/session-history.model'; // Adjust path
 
 @Component({
   selector: 'app-session',
@@ -34,6 +35,9 @@ export class SessionComponent {
 
   showLink = false;
   currentGameLink: string = '';
+
+  isSavingEstimation: boolean = false;
+  estimationSaved: boolean = false;
 
   constructor(
     private gameSocketService: GameSocketService,
@@ -237,6 +241,109 @@ export class SessionComponent {
       },
       error: (err) => {
         console.error('Błąd eksportu CSV:', err.message);
+      },
+    });
+  }
+
+  saveEstimation(): void {
+    if (!this.sessionState || !this.sessionState.tasks) {
+      console.error('No tasks to save.');
+      return;
+    }
+
+    const estimationHistory: EstimationHistory = {
+      userId: this.authService.getUserId() || '',
+      sessionId: this.sessionState.sessionId,
+      storyTitle: this.getCurrentTask()?.name || '',
+      selectedCardValue:
+        this.selectedCardValue !== null ? String(this.selectedCardValue) : '',
+      date: new Date().toISOString(),
+      teammates: this.sessionState.players.map((player) => player.username),
+      allVotes: this.sessionState.players.map((player) => ({
+        username: player.username,
+        card:
+          player.selectedCardValue !== null
+            ? String(player.selectedCardValue)
+            : '',
+      })),
+    };
+
+    this.sessionService.saveEstimationHistory(estimationHistory).subscribe({
+      next: (response) => {
+        console.log('Estimation saved successfully:', response);
+      },
+      error: (err) => {
+        console.error('Błąd zapisu estymacji:', err.message);
+      },
+    });
+  }
+
+  endSession(): void {
+    if (!this.sessionState || !this.playerId) {
+      console.error('Nie można zakończyć sesji, brak danych sesji lub gracza.');
+      return;
+    }
+    // End the session
+    this.gameSocketService.endSession(this.sessionState.sessionId);
+    this.sessionEnded = true;
+  }
+
+  saveCurrentTaskEstimation(): void {
+    if (!this.sessionState || !this.getCurrentTask()) {
+      console.error('Brak aktualnego zadania do zapisania.');
+      return;
+    }
+
+    const currentTask = this.getCurrentTask();
+    if (currentTask?.status !== 'estimated') {
+      console.error('Zadanie nie jest w stanie "estimated".');
+      return;
+    }
+
+    this.isSavingEstimation = true;
+    this.estimationSaved = false;
+
+    // Znajdź głos aktualnego użytkownika
+    const currentPlayer = this.sessionState.players.find(
+      (player) => player.id === this.playerId
+    );
+    const userVote = currentPlayer?.selectedCardValue;
+
+    const estimationHistory: EstimationHistory = {
+      userId: this.authService.getUserId() || '',
+      sessionId: this.sessionState.sessionId,
+      storyTitle: currentTask.name,
+      selectedCardValue:
+        userVote !== null && userVote !== undefined ? String(userVote) : '',
+      date: new Date().toISOString(),
+      teammates: this.sessionState.players
+        .filter((player) => player.id !== this.playerId)
+        .map((player) => player.username),
+      allVotes: this.sessionState.players.map((player) => ({
+        username: player.username,
+        card:
+          player.selectedCardValue !== null &&
+          player.selectedCardValue !== undefined
+            ? String(player.selectedCardValue)
+            : 'brak głosu',
+      })),
+    };
+
+    this.sessionService.saveEstimationHistory(estimationHistory).subscribe({
+      next: (response) => {
+        console.log('Estimation saved successfully:', response);
+        this.isSavingEstimation = false;
+        this.estimationSaved = true;
+
+        // Ukryj komunikat o sukcesie po 3 sekundach
+        setTimeout(() => {
+          this.estimationSaved = false;
+        }, 3000);
+      },
+      error: (err) => {
+        console.error('Błąd zapisu estymacji:', err.message);
+        this.isSavingEstimation = false;
+        // Możesz dodać obsługę błędu w UI
       },
     });
   }

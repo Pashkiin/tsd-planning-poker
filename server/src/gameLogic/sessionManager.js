@@ -44,14 +44,14 @@ class SessionManager {
         return session.addPlayer(userId, username, socketId);
       } catch (error) {
         console.error(
-            `Error adding player ${username} to session ${sessionId}:`,
-            error
+          `Error adding player ${username} to session ${sessionId}:`,
+          error
         );
         return null;
       }
     }
     console.warn(
-        `Session ${sessionId} not found when trying to add player ${username}.`
+      `Session ${sessionId} not found when trying to add player ${username}.`
     );
     return null;
   }
@@ -149,7 +149,21 @@ class SessionManager {
     }
     return null;
   }
+
+  endSession(sessionId) {
+    const session = this.getSession(sessionId);
+    if (session) {
+      session.endSession();
+      this.removeSession(sessionId);
+      console.log(`Session ${sessionId} ended and removed.`);
+      return true;
+    }
+    console.warn(`Session ${sessionId} not found when trying to end it.`);
+    return false;
+  }
 }
+
+
 
 // Make SessionManager a singleton
 module.exports = new SessionManager();

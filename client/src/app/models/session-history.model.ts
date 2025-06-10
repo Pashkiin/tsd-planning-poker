@@ -1,5 +1,5 @@
 export interface EstimationHistory {
-  _id: string;
+  _id?: string;
   userId: string;
   sessionId: string;
   storyTitle: string;
